@@ -285,25 +285,20 @@ section {
     margin-bottom: 1rem;
 }
 
-#socials-container {
+/* #socials-container {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
     gap: 1rem;
-}
+} */
 
-/* ICONS */
-
-.icon {
-    cursor: pointer;
-    height: 2rem;
-}
 
 /* BUTTONS */
 
 .btn-container {
     display: flex;
-    justify-content: center;
+    justify-content: left;
+    align-items: center;
     gap: 1rem;
   }
   
@@ -346,3 +341,17 @@ section {
   .btn-container {
     gap: 1rem;
   }
+
+
+
+  /* ICONS */
+
+.contact-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.contact-icon:hover {
+    filter: brightness(0.8); /* Optional: hover effect */
+}
