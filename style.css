@@ -234,7 +234,6 @@ a:hover {
 
 section {
     padding-top: 4vh;
-    height: 96vh;
     margin: 0 10rem;
     box-sizing: border-box;
     min-height: fit-content;
@@ -367,21 +366,36 @@ section {
     filter: brightness(0.8); 
 }
 
-/* NEWS SECTION */
-#news {
+
+
+/* SUBSECTION */
+
+#subsection {
     margin-top: 3rem;
     padding: 1.5rem;
+    margin-bottom: 1rem;
 }
 
-#news h2 {
+#subsection h2 {
     font-size: 2rem;
-    margin-bottom: 1rem;
-    text-align: center;
+    text-align: left;
 }
+
+
+.divider {
+    border: none;
+    height: 1px;   
+    background-color: #ccc; /* divider color */
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* NEWS */ 
 
 .news-list {
-    list-style-type: none;
-    padding: 0;
+    list-style: square;
+    padding: 0px;
+    margin-left: 1rem;
 }
 
 .news-list li {
@@ -393,5 +407,49 @@ section {
 .news-date {
     font-weight: bold;
     margin-right: 0.5rem;
+}
+
+/* EDUCATION */
+
+/* Education Section */
+#education {
+    padding: 1rem;
+}
+
+.education-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.education-details {
+    max-width: 70%; /* Adjust based on preferred width */
+}
+
+.education-details strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.education-details ul {
+    list-style-type: none; /* Remove default list styling */
+    padding-left: 1rem;     /* Add left padding for bullets */
+}
+
+.education-details ul li::before {
+    content: '•'; 
+    margin-right: 0.5rem;
+    color: black; 
+}
+
+.education-dates {
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: right;
+    justify-content: center;
+    white-space: nowrap; /* Prevent date from wrapping to new line */
 }
 
