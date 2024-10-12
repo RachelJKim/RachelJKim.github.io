@@ -5,19 +5,11 @@
     padding: 0 1rem; /* add horizontal padding for smaller screens */
 }
 
-.publication-page-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    margin-bottom: 3rem; 
-    text-align: center;
-    text-decoration: underline;
-}
-
 .publication-item {
     display: flex;
     align-items: flex-start; 
     gap: 1.5rem; /* gap between image and details */
-    margin-bottom: 2.5rem; 
+    margin-bottom: 2rem; 
 }
 
 .publication-media {

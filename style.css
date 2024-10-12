@@ -126,7 +126,7 @@ a {
 
 a:hover {
     color:gray;
-    text-decoration: underline;
+    /*text-decoration: underline;*/
     text-underline-offset: 1rem;
     text-decoration-color: rgb(181, 181, 181);
 }
@@ -139,12 +139,14 @@ a:hover {
 }
 
 .logo:hover {
-    cursor: default;
+    cursor: pointer;
+    color: black;
 }
 
 .logo-img {
-    height: 1em; /* Set height to match the font size */
+    height: 1em; /* set height to match the font size */
 }
+
 
 
 
@@ -362,7 +364,7 @@ section {
 }
 
 .contact-icon:hover {
-    filter: brightness(0.8); /* Optional: hover effect */
+    filter: brightness(0.8); 
 }
 
 /* NEWS SECTION */
