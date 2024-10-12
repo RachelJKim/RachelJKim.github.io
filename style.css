@@ -7,8 +7,29 @@
 }
 
 body {
+    background-color: white;
+    color: black;
     font-family: "Roboto", sans-serif;
 }
+
+body.hover-mode {  
+    background-color: #50C23C; /* change background color to green */
+    color: white; /* change text color to white */
+}
+
+body.hover-mode a {
+    color: white;
+}
+
+body.hover-mode p {
+    color: #eee;
+}
+
+body.hover-mode .btn {
+    color: white;
+    border-color: white;
+}
+
 
 .roboto-thin {
     font-family: "Roboto", sans-serif;
