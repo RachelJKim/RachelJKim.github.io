@@ -139,9 +139,9 @@ a:hover {
 }
 
 .logo:hover {
-    cursor: pointer;
-    color: black;
+    cursor: default;
 }
+
 
 .logo-img {
     height: 1em; /* set height to match the font size */
