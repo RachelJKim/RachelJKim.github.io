@@ -299,7 +299,8 @@ section {
     font-size: 1rem;
     text-align: left;
     margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 140%;
 }
 
 .section__text__p3 {
@@ -307,7 +308,7 @@ section {
     text-align: left;
     font-weight: 700;
     margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .title {
