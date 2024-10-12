@@ -114,7 +114,8 @@ nav {
 .nav-links {
     gap: 2rem;
     list-style: none;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 500;
 }
 
 a {
@@ -279,6 +280,14 @@ section {
     margin-bottom: 1rem;
 }
 
+.section__text__p3 {
+    font-size: 1rem;
+    text-align: left;
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 .title {
     font-size: 3rem;
     text-align: left;
@@ -312,7 +321,7 @@ section {
   
   .btn-color-1,
   .btn-color-2 {
-    border: rgb(53, 53, 53) 0.1rem solid;
+    border: rgb(53, 53,  53) 0.1rem solid;
   }
   
   .btn-color-1:hover,
@@ -355,3 +364,32 @@ section {
 .contact-icon:hover {
     filter: brightness(0.8); /* Optional: hover effect */
 }
+
+/* NEWS SECTION */
+#news {
+    margin-top: 3rem;
+    padding: 1.5rem;
+}
+
+#news h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.news-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.news-list li {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.news-date {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+

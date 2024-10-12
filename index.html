@@ -16,10 +16,10 @@
             </div>
             <div>
                 <ul class="nav-links">
-                    <li><a href="#research">Research</a></li>
-                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="publications.html">Publications</a></li>
                     <li><a href="#projects">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#contact">ETC</a></li>
                 </ul>
             </div>
         </nav>
@@ -53,6 +53,9 @@
 
                     ddddddsimply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centur
                 </p>
+                <p class="section__text__p3">
+                    Research Interests | XR Interactions, Haptics, Context-Aware, Prototyping Tools 
+                </p>
                 <div class="btn-container">
                     <button 
                         class="btn btn-color-2" 
@@ -60,13 +63,6 @@
                         >
                         Download CV
                     </button>
-                    <!-- <button 
-                        class="btn btn-color-1" 
-                        onclick=""location.href='./#contact'
-                        >
-                        Contact Info
-                    </button> -->
-
                     <img 
                         src="./assets/images/logo/linkedin.png" 
                         alt="LinkedIn" 
@@ -86,28 +82,40 @@
                         onclick="location.href='https://x.com/Rachel_JKim'"
                     />
                 </div>
-                <!-- <div id="socials-container">
-                    <img 
-                        src="./assets/images/logo/linkedin.png" 
-                        alt="My LinkedIn Profile"
-                        class="icon" 
-                        onclick="location.href='https://www.linkedin.com/in/rachel-kim-925366323/'"
-                    />
-                    <img    
-                        src="./assets/images/logo/github.png"
-                        alt="My Github Profile"
-                        class="icon"
-                        onclick="location.href='https://github.com/RachelJKim'"
-                    />
-                    <img
-                        src="./assets/images/logo/twitter.png"
-                        alt="My X Profile"
-                        class="icon"
-                        onclick="location.href='https://x.com/Rachel_JKim'"
-                    />
-                </div> -->
             </div>
         </section>
+
+        <section id="news">
+            <h2>News</h2>
+            <div id="news-content"></div>
+        </section>
         <script src="script.js"></script>
+        <script>
+            // Load news.html content into the #news-content div
+            document.addEventListener("DOMContentLoaded", function() {
+                const filePath = 'news.html'; // Adjust if in a subfolder, e.g., './subfolder/news.html'
+                console.log(`Attempting to load news from: ${filePath}`);
+                
+                fetch(filePath)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`File not found at ${filePath}. Status: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log('File loaded successfully');
+                        document.getElementById('news-content').innerHTML = data;
+                    })
+                    .catch(error => {
+                        console.error('Error loading news:', error);
+                        // Display fallback content or a message to indicate loading failed
+                        document.getElementById('news-content').innerHTML = 
+                            `<p style="color: red;">Failed to load news content. Please ensure 'news.html' is in the correct location.</p>`;
+                    });
+            });
+        </script>
+        
+        
     </body>
 </html>
