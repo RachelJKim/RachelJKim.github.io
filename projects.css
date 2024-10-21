@@ -1,0 +1,229 @@
+/* Project Gallery Grid */
+.project-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns, each taking 1 fraction of the space */
+    gap: 2rem; /* Space between items */
+    justify-items: center; /* Center items horizontally */
+}
+
+
+.projects-page-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 3rem; 
+    text-align: center;
+    text-decoration: underline;
+}
+
+
+/* Wrapper for project */
+.project-wrapper {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Project Header (title and tags in one line) */
+.project-header {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Align title and tags vertically */
+    text-align: center;
+    gap: 1rem; /* Space between the title and tags */
+    margin-bottom: 1rem;
+}
+
+
+/* Project Title */
+.project-title {
+    font-size: 1.4rem;
+    margin: 0; /* Remove margin for alignment */
+}
+
+/* Project Tags */
+.project-tags {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem; /* Space between each tag */
+    flex-wrap: wrap; /* Allow tags to wrap if necessary on small screens */
+}
+
+/* Platform Types and Project Categories */
+.project-type, .project-category {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.6rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Platform Types (Web, VR, AR, Mobile) */
+.project-type {
+    background-color: #50C23C;
+    color: white;
+}
+
+/* Project Categories (Hackathon, Research, etc.) */
+.project-category {
+    background-color: rgb(181, 181, 181);
+    color: white;
+}
+
+.project-type:hover {
+    background-color: #3fa230;
+    cursor: default;
+}
+
+.project-category:hover {
+    background-color: rgb(160, 160, 160);
+    cursor: default;
+}
+
+
+
+
+/* Individual Project Item */
+.project-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    width: 100%; /* Ensures project items take full width within the grid cell */
+    height: 200px; /* Fixed height for consistency */
+    transition: transform 0.3s ease;
+}
+
+.project-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures images maintain aspect ratio and cover the box */
+    transition: transform 0.3s ease;
+}
+
+
+.project-item:hover img {
+    transform: scale(1.1); /* Zoom in on hover */
+}
+
+/* Overlay with Project Details */
+.project-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    color: white;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.project-item:hover .project-overlay {
+    opacity: 1; /* Show the overlay on hover */
+}
+
+/* Text inside the overlay */
+.project-overlay h3 {
+    margin-bottom: 1.5rem;
+    margin-inline: 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgb(181, 181, 181);
+}
+
+
+/* Links in Overlay */
+.project-links a {
+    margin: 0 10px;
+    font-size: 0.9rem;
+    color: #f4f4f4;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.project-links a:hover {
+    text-decoration: underline;
+}
+
+
+
+@media (max-width: 1300px) {
+    .project-gallery {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller screens */
+        gap: 1rem; /* Space between items */
+        justify-items: center; /* Center items horizontally */
+    }
+
+    .project-overlay h3 {
+        margin-bottom: 1.5rem;
+        font-size: 0.75rem;
+        margin: 10px 15px;
+        font-weight: 400;
+        color: rgb(181, 181, 181);
+    }
+
+    .project-overlay a {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 1000px) {
+    .project-title {
+        font-size: 1.2rem;
+    }
+    .project-type, .project-category {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .project-title {
+        font-size: 1.1rem;
+    }
+    .project-type, .project-category {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .project-overlay {
+        padding: 10px;
+    }
+}
+
+/* Mobile screens (480px or less) */
+@media (max-width: 600px) {
+    .project-gallery {
+        grid-template-columns: 1fr; /* 1 column for mobile screens */
+    }
+
+    .project-wrapper {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .project-title {
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+    }
+    .project-type, .project-category {
+        font-size: 0.5rem;
+        padding: 0.1rem 0.3rem;
+    }
+
+    .project-overlay h3 {
+        margin-bottom: 1.5rem;
+        font-size: 0.7rem;
+        margin: 10px 15px;
+        font-weight: 400;
+        color: rgb(181, 181, 181);
+    }
+
+    .project-overlay a {
+        font-size: 0.8rem;
+    }
+    
+}
