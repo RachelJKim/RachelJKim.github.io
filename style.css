@@ -237,7 +237,8 @@ a:hover {
 }
 
 /* Hover effect for mobile links */
-.menu-links a:hover {
+.menu-links a:hover 
+.menu-links a:focus {
     color: gray; /* Change link color on hover */
 }
 
@@ -407,7 +408,8 @@ section {
     cursor: pointer;
 }
 
-.contact-icon:hover {
+.contact-icon:hover
+.contact-icon:focus {
     filter: brightness(0.8); 
 }
 

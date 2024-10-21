@@ -80,3 +80,76 @@ body {
 .publication-link:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 800px) {   
+    .publication-page-title {
+        font-size: 2rem;
+    }
+    
+    .publication-img { /* teaser image */
+        width: 200px; 
+        height: 120px; 
+        object-fit: cover; /* ensures image covers the area without distortion */
+        border-radius: 8px; /* rounds corners */
+    }
+    
+    .publication-info {
+        font-size: 0.7rem;
+        font-weight: 450;
+        margin-bottom: 0.5rem; 
+    }
+    
+    .publication-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem; 
+    }
+    
+    .publication-authors {
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem; 
+    }
+
+    .publication-link {
+        font-size: 0.8rem;
+        color: #0073e6; 
+        text-decoration: none;
+    }
+}
+
+
+@media (max-width: 768) {   
+    .publication-page-title {
+        font-size: 1.6rem;
+    }
+
+    .publication-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    
+    .publication-info {
+        font-size: 0.7rem;
+        font-weight: 450;
+        margin-bottom: 0.4rem; 
+    }
+    
+    .publication-title {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem; 
+    }
+    
+    .publication-authors {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem; 
+    }
+
+
+    .publication-link {
+        font-size: 0.6rem;
+        color: #0073e6; 
+        text-decoration: none;
+    }
+}
