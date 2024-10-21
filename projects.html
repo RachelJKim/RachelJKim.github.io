@@ -1,104 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Gallery</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="mediaqueries.css">
-    <link rel="stylesheet" href="projects.css"> <!-- New CSS file for project gallery -->
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Project Gallery</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="mediaqueries.css">
+        <link rel="stylesheet" href="projects.css"> <!-- New CSS file for project gallery -->
+    </head>
 
-<body>
-    <nav id="desktop-nav">
-        <div class="logo">
-            <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img">
-            achelJK
-        </div>
-        <div>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="#etc">ETC</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <section id="projects">
-        <h3 class="projects-page-title">Project Gallery</h3>
-        <div class="project-gallery">
-            <!-- Project: ALLeX -->
-             <div id="allex" class="project-wrapper">
-                <div class="project-header">
-                    <h3 class="project-title">🥼 ALLeX</h3>                
-                    <div class="project-tags">
-                        <!-- Project categories -->
-                        <p class="project-category">🏅 Hackathon</p>
-                        <!-- Platform types -->
-                        <p class="project-type">WEB</p>
-                        <p class="project-type">AR</p>
-                    </div>
+    <body>
+        <nav id="desktop-nav">
+            <div class="logo">
+                <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img">
+                achelJK
+            </div>
+            <div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="publications.html">Publications</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="#etc">ETC</a></li>
+                </ul>
+            </div>
+        </nav>
+        <nav id="hamburger-nav">
+            <div class="logo">
+                <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img" />
+                achelJK
+            </div>
+            <div class="hamburger-menu">
+                <div class="hamburger-icon" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
-                <div class="project-item">
-                    <img src="./assets/images/projects/allex.GIF" alt="Project Image: ALLeX">
-                    <div class="project-overlay">
-                        <h3>Web-based interactive XR platform for managing immersive chemistry lab classes</h3>
-                        <div class="project-links">
-                            <a href="https://github.com/RachelJKim/ALLeX" target="_blank">GitHub</a>
+                <div class="menu-links">
+                    <li><a href="index.html" onclick="toggleMenu()">Home</a></li>
+                    <li><a href="publications.html" onclick="toggleMenu()">Publications</a></li>
+                    <li><a href="projects.html" onclick="toggleMenu()">Projects</a></li>
+                    <li><a href="#etc" onclick="toggleMenu()">ETC</a></li>
+                </div>
+            </div>
+        </nav>
+        <section id="projects">
+            <h3 class="projects-page-title">Project Gallery</h3>
+            <div class="project-gallery">
+                <!-- Project: ALLeX -->
+                <div id="allex" class="project-wrapper">
+                    <div class="project-header">
+                        <h3 class="project-title">🥼 ALLeX</h3>                
+                        <div class="project-tags">
+                            <!-- Project categories -->
+                            <p class="project-category">🏅 Hackathon</p>
+                            <!-- Platform types -->
+                            <p class="project-type">WEB</p>
+                            <p class="project-type">AR</p>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <img src="./assets/images/projects/allex.GIF" alt="Project Image: ALLeX">
+                        <div class="project-overlay">
+                            <h3>Web-based interactive XR platform for managing immersive chemistry lab classes</h3>
+                            <div class="project-links">
+                                <a href="https://github.com/RachelJKim/ALLeX" target="_blank">GitHub</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Project: TaCo -->
-            <div id="taco" class="project-wrapper">
-                <div class="project-header">
-                    <h3 class="project-title">🖼️ TaCo</h3>                
-                    <div class="project-tags">
-                        <!-- Project categories -->
-                        <p class="project-category">Just For Fun</p>
-                        <!-- Platform types -->
-                        <p class="project-type">ML</p>
-                        <p class="project-type">ACCESSIBILITY</p>
+                <!-- Project: TaCo -->
+                <div id="taco" class="project-wrapper">
+                    <div class="project-header">
+                        <h3 class="project-title">🖼️ TaCo</h3>                
+                        <div class="project-tags">
+                            <!-- Project categories -->
+                            <p class="project-category">Just For Fun</p>
+                            <!-- Platform types -->
+                            <p class="project-type">ML</p>
+                            <p class="project-type">ACCESSIBILITY</p>
+                        </div>
                     </div>
-                </div>
-                <div class="project-item">
-                    <img src="./assets/images/projects/taco.png" alt="Project Image: HapticPilot">
-                    <div class="project-overlay">
-                        <h3>Conveying colors through Tactile Graphics, using Image Segmentation</h3>
-                        <div class="project-links">
-                            <a href="https://github.com/RachelJKim/TaCo">GitHub</a>
+                    <div class="project-item">
+                        <img src="./assets/images/projects/taco.png" alt="Project Image: HapticPilot">
+                        <div class="project-overlay">
+                            <h3>Conveying colors through Tactile Graphics, using Image Segmentation</h3>
+                            <div class="project-links">
+                                <a href="https://github.com/RachelJKim/TaCo">GitHub</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Project: HapticPilot -->
-            <div id="hapticpilot" class="project-wrapper">
-                <div class="project-header">
-                    <h3 class="project-title">🤙🏻 HapticPilot</h3>                
-                    <div class="project-tags">
-                        <!-- Project categories -->
-                        <p class="project-category">Research</p>
-                        <!-- Platform types -->
-                        <p class="project-type">VR</p>
-                        <p class="project-type">HARDWARE</p>
+                <!-- Project: HapticPilot -->
+                <div id="hapticpilot" class="project-wrapper">
+                    <div class="project-header">
+                        <h3 class="project-title">🤙🏻 HapticPilot</h3>                
+                        <div class="project-tags">
+                            <!-- Project categories -->
+                            <p class="project-category">Research</p>
+                            <!-- Platform types -->
+                            <p class="project-type">VR</p>
+                            <p class="project-type">HARDWARE</p>
+                        </div>
                     </div>
-                </div>
-                <div class="project-item">
-                    <img src="./assets/images/projects/hapticpilot.GIF" alt="Project Image: HapticPilot">
-                    <div class="project-overlay">
-                        <h3>Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality</h3>
-                        <div class="project-links">
-                            <a href="https://dl.acm.org/doi/abs/10.1145/3631453">Publication</a>
-                            <a href="https://www.youtube.com/watch?v=PJk7SUa8ZpI" target="_blank">Video</a>
+                    <div class="project-item">
+                        <img src="./assets/images/projects/hapticpilot.GIF" alt="Project Image: HapticPilot">
+                        <div class="project-overlay">
+                            <h3>Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality</h3>
+                            <div class="project-links">
+                                <a href="https://dl.acm.org/doi/abs/10.1145/3631453">Publication</a>
+                                <a href="https://www.youtube.com/watch?v=PJk7SUa8ZpI" target="_blank">Video</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-    </section>
-</body>
+            </div>
+        </section>
+        <script src="script.js"></script>
+    </body>
 </html>

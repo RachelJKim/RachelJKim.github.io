@@ -1,101 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RachelJK</title>
-    <link rel="icon" href="./assets/images/rachel/rachel-logo.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="mediaqueries.css">
-    <link rel="stylesheet" href="publications.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RachelJK</title>
+        <link rel="icon" href="./assets/images/rachel/rachel-logo.png" type="image/png">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="mediaqueries.css">
+        <link rel="stylesheet" href="publications.css">
+    </head>
 
 
-<body>
-    <nav id="desktop-nav">
-        <div class="logo">
-            <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img">
-            achelJK
-        </div>
-        <div>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="#etc">ETC</a></li>
-            </ul>
-        </div>
-    </nav>
-    <nav id="hamburger-nav">
-        <div class="logo">
-            <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img" />
-            achelJK
-        </div>
-        <div class="hamburger-menu">
-            <div class="hamburger-icon" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+    <body>
+        <nav id="desktop-nav">
+            <div class="logo">
+                <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img">
+                achelJK
             </div>
-            <div class="menu-links">
-                <li><a href="index.html" onclick="toggleMenu()">Home</a></li>
-                <li><a href="publications.html" onclick="toggleMenu()">Publications</a></li>
-                <li><a href="projects.html" onclick="toggleMenu()">Projects</a></li>
-                <li><a href="#etc" onclick="toggleMenu()">ETC</a></li>
+            <div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="publications.html">Publications</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="#etc">ETC</a></li>
+                </ul>
             </div>
-        </div>
-    </nav>
-
-    <section id="publications">
-        <div class="publication-container">
-            <h3 class="publication-page-title">Publications</h3>
-            <div class="publication-list">
-
-                <!-- [IMWUT'23] HapticPilot ------------------------------------------->
-                <div id="hapticpilot" class="publication-item">
-                    <div class="publication-media">
-                        <img 
-                            class="publication-img"
-                            src="./assets/images/publications/hapticpilot.png" 
-                            alt="Teaser Image">
-                    </div>
-                    <div class="publication-details">
-                        <!-- 1. Conference --------> <p class="publication-info">[IMWUT'23]</p>
-                        <!-- 2. Title -------------> <h3 class="publication-title">HapticPilot: Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality</h3>
-                        <!-- 3. Authors -----------> <p class="publication-authors"> Youjin Sung, <strong>Rachel Kim</strong>, Kun Woo Song, Yitian Shao, Sang Ho Yoon</p>
-                        <!-- 4. Publication Link -->
-                        <div class="publication-links">
-                            <!-- 4.1 PDF --> <a href="https://drive.google.com/file/d/1o_eSmWT46Qvo9EH3GD-jc355G4TtQZeS/view?usp=sharing" target="_blank" class="publication-link">PDF</a>
-                            <!-- 4.2 DOI --> <a href="https://dl.acm.org/doi/abs/10.1145/3631453" target="_blank" class="publication-link">DOI</a>
-                            <!-- 4.3 Video --> <a href="https://youtu.be/PJk7SUa8ZpI?si=xpLjlQfuJPNW3a3E" target="_blank" class="publication-link">VIDEO</a>
-                        </div>
-                    </div>
-                    
+        </nav>
+        <nav id="hamburger-nav">
+            <div class="logo">
+                <img src="./assets/images/rachel/rachel-logo-transparent.png" alt="Website Logo" class="logo-img" />
+                achelJK
+            </div>
+            <div class="hamburger-menu">
+                <div class="hamburger-icon" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
-
-                <!-- [VRST'22 Poster] Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR -->
-                <div id="vrst22-poster" class="publication-item">
-                    <div class="publication-media">
-                        <img 
-                            class="publication-img"
-                            src="./assets/images/publications/vrst22-poster.png" 
-                            alt="Teaser Image">
-                    </div>
-                    <div class="publication-details">
-                        <!-- 1. Conference --------> <p class="publication-info">[VRST'22 Poster]</p>
-                        <!-- 2. Title -------------> <h3 class="publication-title">Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR</h3>
-                        <!-- 3. Authors -----------> <p class="publication-authors"> Youjin Sung, Yitian Shao, <strong>Rachel Kim</strong>, Sang Ho Yoon</p>
-                        <!-- 4. Publication Link -->
-                        <div class="publication-links">
-                            <a href="https://drive.google.com/file/d/1t8wBANStvBEIRH4kaNDKAUPuB1rKPL-F/view?usp=sharing" target="_blank" class="publication-link">PDF</a>
-                            <a href="https://dl.acm.org/doi/abs/10.1145/3631453" target="_blank" class="publication-link">DOI</a>
-                        </div>
-                    </div>
-                    
+                <div class="menu-links">
+                    <li><a href="index.html" onclick="toggleMenu()">Home</a></li>
+                    <li><a href="publications.html" onclick="toggleMenu()">Publications</a></li>
+                    <li><a href="projects.html" onclick="toggleMenu()">Projects</a></li>
+                    <li><a href="#etc" onclick="toggleMenu()">ETC</a></li>
                 </div>
             </div>
-        </div>
-    </section>
-</body>
+        </nav>
+
+        <section id="publications">
+            <div class="publication-container">
+                <h3 class="publication-page-title">Publications</h3>
+                <div class="publication-list">
+
+                    <!-- [IMWUT'23] HapticPilot ------------------------------------------->
+                    <div id="hapticpilot" class="publication-item">
+                        <div class="publication-media">
+                            <img 
+                                class="publication-img"
+                                src="./assets/images/publications/hapticpilot.png" 
+                                alt="Teaser Image">
+                        </div>
+                        <div class="publication-details">
+                            <!-- 1. Conference --------> <p class="publication-info">[IMWUT'23]</p>
+                            <!-- 2. Title -------------> <h3 class="publication-title">HapticPilot: Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality</h3>
+                            <!-- 3. Authors -----------> <p class="publication-authors"> Youjin Sung, <strong>Rachel Kim</strong>, Kun Woo Song, Yitian Shao, Sang Ho Yoon</p>
+                            <!-- 4. Publication Link -->
+                            <div class="publication-links">
+                                <!-- 4.1 PDF --> <a href="https://drive.google.com/file/d/1o_eSmWT46Qvo9EH3GD-jc355G4TtQZeS/view?usp=sharing" target="_blank" class="publication-link">PDF</a>
+                                <!-- 4.2 DOI --> <a href="https://dl.acm.org/doi/abs/10.1145/3631453" target="_blank" class="publication-link">DOI</a>
+                                <!-- 4.3 Video --> <a href="https://youtu.be/PJk7SUa8ZpI?si=xpLjlQfuJPNW3a3E" target="_blank" class="publication-link">VIDEO</a>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- [VRST'22 Poster] Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR -->
+                    <div id="vrst22-poster" class="publication-item">
+                        <div class="publication-media">
+                            <img 
+                                class="publication-img"
+                                src="./assets/images/publications/vrst22-poster.png" 
+                                alt="Teaser Image">
+                        </div>
+                        <div class="publication-details">
+                            <!-- 1. Conference --------> <p class="publication-info">[VRST'22 Poster]</p>
+                            <!-- 2. Title -------------> <h3 class="publication-title">Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR</h3>
+                            <!-- 3. Authors -----------> <p class="publication-authors"> Youjin Sung, Yitian Shao, <strong>Rachel Kim</strong>, Sang Ho Yoon</p>
+                            <!-- 4. Publication Link -->
+                            <div class="publication-links">
+                                <a href="https://drive.google.com/file/d/1t8wBANStvBEIRH4kaNDKAUPuB1rKPL-F/view?usp=sharing" target="_blank" class="publication-link">PDF</a>
+                                <a href="https://dl.acm.org/doi/abs/10.1145/3631453" target="_blank" class="publication-link">DOI</a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script src="script.js"></script>
+    </body>
 </html>
