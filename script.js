@@ -1,3 +1,4 @@
+/* 1. Toggle Hamburger Menu */
 function toggleMenu() {
     const menu = document.querySelector(".menu-links");
     const icon = document.querySelector(".hamburger-icon");
@@ -6,10 +7,17 @@ function toggleMenu() {
 }
 
 /* 2. Hover Upon Profile Picture */
+
+// 2.1) Preload the hover image
+const hoverImg = new Image();
+hoverImg.src = './assets/images/rachel/profile-pic-green-cropped.png';
+
+
+
 const profilePic = document.querySelector('.profile-pic');
 const body = document.body;
 const originalSrc = profilePic.src;
-const hoverSrc = './assets/images/rachel/profile-pic-green-cropped.png'
+const hoverSrc = hoverImg.src;
 
 profilePic.addEventListener('mouseenter', () => {
     body.classList.add('hover-mode');

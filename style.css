@@ -296,6 +296,19 @@ section {
     height: 80vh;
 }
 
+.profile-pic { /* default profile pic */
+    background-image: url('./assets/images/rachel/profile-pic-cropped-grad.png');
+    width: 400px;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+}
+
+.profile-pic:hover { /* hovered profile pic */
+    background-image: url('./assets/images/rachel/profile-pic-green-cropped.png');
+}
+
+
 .section__pic-container {
     display: flex;
     height: 400px;
