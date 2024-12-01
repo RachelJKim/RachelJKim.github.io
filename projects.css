@@ -38,6 +38,8 @@ body {
     text-align: center;
     gap: 1rem; /* Space between the title and tags */
     margin-bottom: 1rem;
+    flex-wrap: nowrap; /* Prevent wrapping into a new line */
+    overflow: hidden; /* Prevent overflow */
 }
 
 
@@ -45,6 +47,9 @@ body {
 .project-title {
     font-size: 1.4rem;
     margin: 0; /* Remove margin for alignment */
+    white-space: nowrap; /* Prevent the title from breaking into multiple lines */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
 }
 
 /* Project Tags */
@@ -52,7 +57,9 @@ body {
     display: flex;
     justify-content: center;
     gap: 0.5rem; /* Space between each tag */
-    flex-wrap: wrap; /* Allow tags to wrap if necessary on small screens */
+    flex-wrap: nowrap; /* Prevent wrapping into a new line */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow content */
 }
 
 /* Platform Types and Project Categories */
@@ -62,6 +69,10 @@ body {
     font-size: 0.6rem;
     border-radius: 20px;
     font-weight: 500;
+    text-align: center;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis if the tag text overflows */
 }
 
 /* Platform Types (Web, VR, AR, Mobile) */
@@ -189,6 +200,11 @@ body {
 }
 
 @media (max-width: 768px) {
+    .project-header {
+        justify-content: flex-start; /* Align everything to the left */
+        gap: 0.5rem; /* Adjust spacing for smaller screens */
+    }
+
     .project-title {
         font-size: 1.1rem;
     }
@@ -217,6 +233,13 @@ body {
         font-size: 1rem;
         margin-bottom: 0.3rem;
     }
+
+    .project-tags {
+        justify-content: center;
+        flex-wrap: wrap; /* Allow wrapping if needed */
+        gap: 0.3rem;
+    }
+
     .project-type, .project-category {
         font-size: 0.5rem;
         padding: 0.1rem 0.3rem;
