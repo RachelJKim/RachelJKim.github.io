@@ -202,6 +202,17 @@ a:hover {
     position: relative;
 }
 
+.close-button {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
 .menu-links {
     display: none;
     flex-direction: column;
@@ -250,29 +261,6 @@ a:hover {
     display: flex;
 }
 
-.hamburger-icon.open span:first-child {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.hamburger-icon.open span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger-icon.open span:last-child {
-    transform: rotate(-45deg) translate(5px, -5px);
-}
-
-.hamburger-icon span:first-child {
-    transform: none;
-}
-
-.hamburger-icon span:first-child {
-    opacity: 1;
-}
-
-.hamburger-icon span:first-child {
-    transform: none;
-}
 
 /* SECTIONS */
 
