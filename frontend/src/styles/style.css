@@ -71,15 +71,10 @@ section {
 }
 
 .profile-pic {
-  background-image: url('./assets/images/rachel/profile-pic-cropped-grad.png');
   width: 400px;
   height: 400px;
-  background-size: cover;
-  background-position: center;
-}
-
-.profile-pic:hover {
-  background-image: url('./assets/images/rachel/profile-pic-green-cropped.png');
+  object-fit: cover;
+  /* Image src is swapped by JS for hover effect */
 }
 
 .section__pic-container {

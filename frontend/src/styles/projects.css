@@ -1,9 +1,6 @@
-
-body {
-    background-color: rgb(251,255,251);
-    color: black;
-    font-family: "Roboto", sans-serif;
-    transition: background-color 1s ease, color 0.5s ease;
+/* Scoped so main body stays default unless on Projects page */
+body.projects-page {
+  background-color: rgb(251, 255, 251);
 }
 
 /* Project Gallery Grid */

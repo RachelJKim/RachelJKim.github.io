@@ -81,7 +81,7 @@ export default function Home() {
             I believe this can happen through versatile interfaces and intuitive interactions, bridging the digital and physical dimensions.
         </p>
         <p className="section__text__p3">
-            Research Interests: HCI, XR | Context-Aware Systems, Gestural Interactions, Prototyping Tools, Haptics
+            Research Interests: HCI, XR&nbsp;&nbsp;|&nbsp;&nbsp;Context-Aware Systems, Gestural Interactions, Prototyping Tools, Haptics
         </p>
         <div className="btn-container">
             <button className="btn btn-color-2" onClick={() => window.open('/files/cv-rachel-kim.pdf', '_blank')}>Download CV</button>
@@ -97,7 +97,14 @@ export default function Home() {
     <section className="subsection" id="subsection">
         <h2>News</h2>
         <hr className="divider" />
-        <div id="news-content"></div>
+        <ul className="news-list">
+          <li><span className="news-date">Oct 2024</span> &emsp; 🏆 1st place in hackathon, and showcased ALLeX at Daejeon Science Festival</li>
+          <li><span className="news-date">May 2024</span> &emsp; Student Volunteer at ACM CHI 2024 @Honolulu</li>
+          <li><span className="news-date">Nov 2023</span> &emsp; Paper (HapticPilot) accepted at 🥳 ACM IMWUT 2023 </li>
+          <li><span className="news-date">Aug 2023</span> &emsp; Returned from my 6-month exchange student at Politecnico di Milano</li>
+          <li><span className="news-date">Dec 2022</span> &emsp; Our poster recieved the 🏆 "Best In-Person Poster/Demo Award" at ACM VRST 2022 </li>
+          <li><span className="news-date">Sep 2022</span> &emsp; Poster accepted at 🥳 ACM VRST 2022 </li>
+        </ul>
         <hr className="divider" />
     </section>
 
