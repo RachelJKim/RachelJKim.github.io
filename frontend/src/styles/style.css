@@ -56,12 +56,6 @@ section {
 }
 
 /* PROFILE SECTION */
-/* #profile {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  height: 80vh;
-} */
 #profile {
   display: flex;
   flex-direction: row;

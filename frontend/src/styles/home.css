@@ -1,0 +1,111 @@
+/* Home page: Apple-style scroll-snap layout */
+
+.home-scroll-container {
+  height: calc(100vh - 14vh);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+
+  /* hide scrollbar but keep functionality */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.home-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero section — fills the entire visible area */
+.home-hero {
+  height: calc(100vh - 14vh);
+  min-height: 0;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.home-hero #profile {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  padding: 0 10rem;
+  padding-top: 0;
+  margin: 0;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 0;
+}
+
+/* Details section — snaps in as the second "page" */
+.home-details {
+  scroll-snap-align: start;
+  min-height: calc(100vh - 14vh);
+  padding-bottom: 4rem;
+}
+
+/* ---- Scroll-down affordance (bouncing chevron) ---- */
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgb(160, 160, 160);
+  animation: bounce 2s ease infinite;
+  transition: opacity 0.4s ease;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.scroll-indicator:hover {
+  color: rgb(100, 100, 100);
+}
+
+.scroll-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.hover-mode .scroll-indicator {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.hover-mode .scroll-indicator:hover {
+  color: white;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 1000px) {
+  .home-hero #profile {
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-hero #profile {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    text-align: center;
+  }
+}

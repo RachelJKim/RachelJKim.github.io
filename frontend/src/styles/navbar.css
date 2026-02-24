@@ -7,7 +7,8 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: 17vh;
+  height: 14vh;
+  padding-top: 3vh;
   z-index: 1000;
   background-color: rgb(240, 239, 253);
   box-sizing: border-box;
@@ -42,7 +43,7 @@ nav {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 17vh;
+  height: 11vh;
   font-family: 'Inter', sans-serif;
 }
 
@@ -148,7 +149,7 @@ a:hover {
 
 /* Push page content below fixed navbar */
 .main-content {
-  padding-top: 17vh;
+  padding-top: 14vh;
   min-height: 100vh;
 }
 
@@ -162,7 +163,7 @@ a:hover {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 17vh;
+    height: 11vh;
   }
 }
 
