@@ -13,6 +13,27 @@ const R = 125, REPEL = 2.2, K = 0.035, DAMP = 0.74;
 const CLICK_IMPULSE = 26;      // strength of the pop when a rock is clicked
 const SCATTER_MIN = 14, SCATTER_RANGE = 20;
 
+/* ---- Intro pile-in ----
+   Set INTRO_ENABLED to false to skip it — the pile just appears, already settled, and the
+   cursor physics behave exactly as before. Override per-visit with ?intro=0 / ?intro=1
+   (handy for comparing without editing), and call playRockIntro() to replay it on demand.
+
+   The source photo is shot from directly above, so the screen plane *is* the ground.
+   A rock sliding in from the top edge would read as skidding sideways along the ground,
+   which is why that looks wrong. Instead each rock falls toward the camera: it starts
+   large (near the lens), shrinks to its resting size as it meets the ground, and lands
+   with a short squash. Lateral drift is kept tiny so the motion stays vertical-in-depth.  */
+const INTRO_ENABLED = true;    // master switch for the pile-in animation
+const INTRO_FALL = 620;        // ms for a single rock's fall
+const INTRO_STAGGER = 6;       // ms between rocks (big ones land first, forming the base)
+const INTRO_JITTER = 110;      // ms of randomness per rock so it doesn't look mechanical
+// Cutouts are stored at native coordinate resolution and drawn below 1:1, so a modest
+// start scale keeps the intro from ever upscaling past native and going soft.
+const INTRO_SCALE = 1.22;      // starting scale — how "close to the lens" a rock begins
+const INTRO_DRIFT = 8;         // px of lateral drift while falling
+const INTRO_SPIN = 7;          // max degrees of spin, settling to level
+const INTRO_FADE = 0.22;       // fraction of the fall spent fading in (short = crisp)
+
 const DATA = window.ROCK_DATA;
 const stage = document.getElementById('stage');
 const stagewrap = document.getElementById('stagewrap');
@@ -26,8 +47,16 @@ const rocks = DATA.rocks.map(r => {
   img.draggable = false;
   stage.appendChild(img);
   const mass = 0.35 + 0.65 * Math.sqrt(r.area / maxA);   // big rocks are heavier
-  return { ...r, img, mass, ox: 0, oy: 0, vx: 0, vy: 0, rot: 0, vr: 0 };
+  return {
+    ...r, img, mass, ox: 0, oy: 0, vx: 0, vy: 0, rot: 0, vr: 0,
+    sc: 1,                                 // render scale (driven by the intro)
+    delay: 0, dur: INTRO_FALL,             // intro timing, assigned in playIntro()
+    dRot: 0, dx: 0, dy: 0,                 // per-rock intro rotation / drift, ditto
+  };
 });
+
+// Biggest rocks land first so the pile visibly builds from its base outward.
+const fallOrder = [...rocks].sort((a, b) => b.area - a.area);
 
 function layout() {
   // The source image is portrait, so we rotate the whole stage 90 deg to read as
@@ -83,7 +112,60 @@ document.getElementById('reset').onclick = () => {
   for (const r of rocks) { r.ox = r.oy = r.vx = r.vy = r.rot = r.vr = 0; r.img.style.zIndex = ''; }
 };
 
-function frame() {
+/* Restart the pile-in. Exposed as window.playRockIntro() so a route change can
+   replay it when this page is entered from another one. */
+let introStart = 0, introing = false;
+function playIntro() {
+  fallOrder.forEach((r, i) => {
+    r.delay = i * INTRO_STAGGER + Math.random() * INTRO_JITTER;
+    r.dur = INTRO_FALL * (0.85 + Math.random() * 0.3);
+    r.dRot = (Math.random() - 0.5) * 2 * INTRO_SPIN;
+    const a = Math.random() * 6.28, d = Math.random() * INTRO_DRIFT;
+    r.dx = Math.cos(a) * d; r.dy = Math.sin(a) * d;
+    r.ox = r.oy = r.vx = r.vy = r.rot = r.vr = 0;
+    r.sc = INTRO_SCALE;
+    r.img.style.opacity = '0';
+    r.img.style.zIndex = '';
+  });
+  introStart = performance.now();
+  introing = true;
+}
+window.playRockIntro = playIntro;
+
+// Long, soft deceleration (close to easeOutCubic) with just a trace of overshoot, so a
+// rock eases onto the ground and barely settles rather than snapping into place.
+const easeLand = t => 1 + 1.15 * Math.pow(t - 1, 3) + 0.15 * Math.pow(t - 1, 2);
+
+function stepIntro(now) {
+  let done = true;
+  for (const r of rocks) {
+    const t = (now - introStart - r.delay) / r.dur;
+    if (t >= 1) { r.sc = 1; r.img.style.opacity = ''; continue; }
+    done = false;
+    if (t <= 0) { r.sc = INTRO_SCALE; continue; }   // still waiting its turn
+    const e = easeLand(t);
+    r.sc = INTRO_SCALE + (1 - INTRO_SCALE) * e;
+    r.ox = r.dx * (1 - e); r.oy = r.dy * (1 - e);
+    r.rot = r.dRot * (1 - e);
+    // Reach full opacity early: a rock spends most of its fall solid, not translucent,
+    // so 123 overlapping cutouts never stack up into haze.
+    r.img.style.opacity = t >= INTRO_FADE ? '1' : (t / INTRO_FADE).toFixed(2);
+  }
+  if (done) introing = false;
+}
+
+function frame(now) {
+  if (introing) {
+    stepIntro(now);
+    for (const r of rocks) {
+      if (r.sc === INTRO_SCALE && r.img.style.opacity === '0') continue;   // not yet dropped
+      r.img.style.transform =
+        'translate(' + (r.hx + r.ox).toFixed(1) + 'px,' + (r.hy + r.oy).toFixed(1) + 'px)' +
+        ' rotate(' + r.rot.toFixed(2) + 'deg) scale(' + r.sc.toFixed(3) + ')';
+    }
+    requestAnimationFrame(frame);
+    return;
+  }
   for (const r of rocks) {
     // Repel from cursor
     const dx = (r.pcx + r.ox) - mx, dy = (r.pcy + r.oy) - my, d = Math.hypot(dx, dy) || 0.001;
@@ -108,4 +190,30 @@ function frame() {
   }
   requestAnimationFrame(frame);
 }
+
+// ?intro=0 / ?intro=1 overrides the constant for this visit. Anything else falls through
+// to INTRO_ENABLED. Respect a reduced-motion preference regardless of either.
+const introParam = new URLSearchParams(location.search).get('intro');
+const introOn =
+  matchMedia('(prefers-reduced-motion: reduce)').matches ? false :
+  introParam === '0' ? false :
+  introParam === '1' ? true : INTRO_ENABLED;
+
 requestAnimationFrame(frame);
+
+if (introOn) {
+  // Hide the pile until the intro starts, so nothing flashes into place first.
+  for (const r of rocks) r.img.style.opacity = '0';
+  // Wait for the cutouts to decode, otherwise early rocks land as blank gaps.
+  Promise.all(rocks.map(r => r.img.decode().catch(() => {}))).then(playIntro);
+
+  // Coming back to the page (bfcache restore) replays the pile-in.
+  window.addEventListener('pageshow', e => { if (e.persisted) playIntro(); });
+}
+
+// requestAnimationFrame is paused while the tab is hidden, so an intro that started (or
+// was queued) in the background would otherwise find its whole duration already elapsed
+// and snap straight to the finished pile. Rebase the clock when the tab comes back.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && introing) introStart = performance.now();
+});

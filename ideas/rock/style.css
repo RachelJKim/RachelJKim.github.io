@@ -48,7 +48,8 @@ p.sub {
   position: absolute;
   top: 0;
   left: 0;
-  will-change: transform;
+  transform-origin: center center;
+  will-change: transform, opacity;
   pointer-events: auto;
   user-select: none;
   -webkit-user-drag: none;
