@@ -12,6 +12,7 @@ export default function Navbar() {
 
   const navWrapperClass = [
     'navbar-wrapper',
+    location.pathname === '/' ? 'home-page' : '',
     location.pathname === '/publications' ? 'publications-page' : '',
     location.pathname === '/projects' ? 'projects-page' : '',
   ].filter(Boolean).join(' ')

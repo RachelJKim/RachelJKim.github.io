@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import GooglyEye from '../components/GooglyEye'
 import '../styles/home.css'
 
 export default function Home() {
@@ -17,100 +19,42 @@ export default function Home() {
     return () => container.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    const profilePic = document.querySelector('.profile-pic')
-    const body = document.body
-    const hoverImg = new Image()
-    hoverImg.src = '/images/rachel/profile-pic-green-cropped.png'
-    const originalSrc = profilePic?.src
-
-    function handleMouseEnter() {
-      body.classList.add('hover-mode')
-      profilePic.src = hoverImg.src
-    }
-
-    function handleMouseLeave() {
-      body.classList.remove('hover-mode')
-      profilePic.src = originalSrc
-    }
-
-    function handleProfileClick() {
-      if (body.classList.contains('hover-mode')) {
-        body.classList.remove('hover-mode')
-        profilePic.src = originalSrc
-      } else {
-        body.classList.add('hover-mode')
-        profilePic.src = hoverImg.src
-      }
-    }
-
-    function setupProfilePicEvents() {
-      if (!profilePic) return
-
-      profilePic.removeEventListener('mouseenter', handleMouseEnter)
-      profilePic.removeEventListener('mouseleave', handleMouseLeave)
-      profilePic.removeEventListener('click', handleProfileClick)
-
-      const currentMode = window.innerWidth > 768 ? 'desktop' : 'mobile'
-
-      body.classList.remove('hover-mode')
-      profilePic.src = originalSrc
-
-      if (currentMode === 'desktop') {
-        profilePic.addEventListener('mouseenter', handleMouseEnter)
-        profilePic.addEventListener('mouseleave', handleMouseLeave)
-      } else {
-        profilePic.addEventListener('click', handleProfileClick)
-      }
-    }
-
-    setupProfilePicEvents()
-    window.addEventListener('resize', setupProfilePicEvents)
-
-    return () => {
-      window.removeEventListener('resize', setupProfilePicEvents)
-    }
-  }, [])
-
   const scrollToDetails = () => {
     detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
     <div className="home-scroll-container" ref={scrollRef}>
-      {/* Hero — profile fills the viewport */}
+      {/* Hero — full-bleed Porto sunset */}
       <div className="home-hero">
-        <section id="profile">
-          <div className="section__pic-container">
-            <img
-              src="/images/rachel/profile-pic-cropped-grad.png"
-              alt="Rachel Kim profile picture"
-              className="profile-pic"
-            />
-          </div>
-          <div className="section__text">
-            <h1 className="title">Rachel Kim | 김정민</h1>
-            <p className="section__text__p2">
-              I am a master's student in School of Computing at KAIST, at the <a href="https://hcitech.org/">HCITech Lab (advisor: Sang-Ho Yoon)</a>.
-              My research interests are in designing and developing the future interactive systems.
-              Currently, I focus on XR interfaces and interaction design, working toward making XR a pervasive part of our everyday lives.
-              <br /><br />
-              Beyond research, I enjoy bringing our imaginative concepts into tangible experiences.
-              I envision a world where we can reshape how we perceive and share our experiences.
-              I believe this can happen through versatile interfaces and intuitive interactions, bridging the digital and physical dimensions.
-            </p>
-            <p className="section__text__p3">
-              Research Interests: HCI, XR&nbsp;&nbsp;|&nbsp;&nbsp;Context-Aware Systems, Gestural Interactions, Prototyping Tools, Haptics
-            </p>
-            <div className="btn-container">
-              <button className="btn btn-color-2" onClick={() => window.open('/files/cv-rachel-kim.pdf', '_blank')}>Download CV</button>
-              <img className="icon contact-icon" src="/images/logo/google-scholar.png" alt="Scholar" onClick={() => window.location.href = "https://scholar.google.com/citations?user=MHj2MAoAAAAJ"} />
-              <img className="icon contact-icon" src="/images/logo/linkedin.png" alt="LinkedIn" onClick={() => window.location.href = "https://www.linkedin.com/in/rachel-kim-925366323/"} />
-              <img className="icon contact-icon" src="/images/logo/github.png" alt="GitHub" onClick={() => window.location.href = "https://github.com/RachelJKim"} />
-              <img className="icon contact-icon" src="/images/logo/twitter.png" alt="Twitter" onClick={() => window.location.href = "https://x.com/Rachel_JKim"} />
-            </div>
-          </div>
-        </section>
+        {/* Two copies of the same photo, as in the Canva source: an enlarged
+            faded one behind, and a crisp one offset over the right. The seam
+            down the left is simply the crisp copy's edge. */}
+        <img className="hero-photo hero-photo--back" src="/images/backgrounds/background-porto.jpg" alt="" aria-hidden="true" />
+        <img className="hero-photo hero-photo--front" src="/images/backgrounds/background-porto.jpg" alt="Sunset over Porto" />
+
+        {/* The eyes straddle the seam */}
+        <div className="hero-eyes">
+          <GooglyEye size="10.024vw" className="eye-left" />
+          <GooglyEye size="10.024vw" className="eye-right" />
+        </div>
+
+        <h1 className="hero-title">
+          <span className="hero-title__intro">This is</span>
+          <span className="hero-title__name">
+            Hello,&nbsp; Rachel<span className="hero-title__last">Kim</span>
+          </span>
+        </h1>
+
+        <nav className="hero-nav" aria-label="Main">
+          <span className="hero-nav__rule" aria-hidden="true" />
+          <ul>
+            <li><button type="button" onClick={scrollToDetails}>About</button></li>
+            <li><Link to="/publications">Research</Link></li>
+            <li><Link to="/projects">Projects</Link></li>
+            <li className="hero-nav__misc"><a href="#etc">misc</a></li>
+          </ul>
+        </nav>
 
         {/* Scroll-down affordance */}
         <button
@@ -126,8 +70,34 @@ export default function Home() {
 
       {/* Details — snaps into view */}
       <div className="home-details" ref={detailsRef}>
+        {/* About */}
+        <section className="subsection">
+          <h2>About</h2>
+          <hr className="divider" />
+          <p className="section__text__p2">
+            I am a master's student in School of Computing at KAIST, at the <a href="https://hcitech.org/">HCITech Lab (advisor: Sang-Ho Yoon)</a>.
+            My research interests are in designing and developing the future interactive systems.
+            Currently, I focus on XR interfaces and interaction design, working toward making XR a pervasive part of our everyday lives.
+            <br /><br />
+            Beyond research, I enjoy bringing our imaginative concepts into tangible experiences.
+            I envision a world where we can reshape how we perceive and share our experiences.
+            I believe this can happen through versatile interfaces and intuitive interactions, bridging the digital and physical dimensions.
+          </p>
+          <p className="section__text__p3">
+            Research Interests: HCI, XR&nbsp;&nbsp;|&nbsp;&nbsp;Context-Aware Systems, Gestural Interactions, Prototyping Tools, Haptics
+          </p>
+          <div className="btn-container">
+            <button className="btn btn-color-2" onClick={() => window.open('/files/cv-rachel-kim.pdf', '_blank')}>Download CV</button>
+            <img className="icon contact-icon" src="/images/logo/google-scholar.png" alt="Scholar" onClick={() => window.location.href = "https://scholar.google.com/citations?user=MHj2MAoAAAAJ"} />
+            <img className="icon contact-icon" src="/images/logo/linkedin.png" alt="LinkedIn" onClick={() => window.location.href = "https://www.linkedin.com/in/rachel-kim-925366323/"} />
+            <img className="icon contact-icon" src="/images/logo/github.png" alt="GitHub" onClick={() => window.location.href = "https://github.com/RachelJKim"} />
+            <img className="icon contact-icon" src="/images/logo/twitter.png" alt="Twitter" onClick={() => window.location.href = "https://x.com/Rachel_JKim"} />
+          </div>
+          <hr className="divider" />
+        </section>
+
         {/* News */}
-        <section className="subsection" id="subsection">
+        <section className="subsection">
           <h2>News</h2>
           <hr className="divider" />
           <ul className="news-list">
@@ -142,7 +112,7 @@ export default function Home() {
         </section>
 
         {/* Education */}
-        <section className="subsection" id="subsection">
+        <section className="subsection">
           <h2>Education</h2>
           <hr className="divider" />
           <div className="education-entry">
@@ -163,7 +133,7 @@ export default function Home() {
         </section>
 
         {/* Honors & Awards */}
-        <section className="subsection" id="subsection">
+        <section className="subsection">
           <h2>Honors & Awards</h2>
           <hr className="divider" />
           <div className="education-entry">

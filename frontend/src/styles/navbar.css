@@ -153,6 +153,15 @@ a:hover {
   min-height: 100vh;
 }
 
+/* Home hero is full-bleed and carries its own nav */
+.main-content--flush {
+  padding-top: 0;
+}
+
+.navbar-wrapper.home-page {
+  display: none;
+}
+
 /* Responsive layout: toggle navbars */
 @media (max-width: 768px) {
   #desktop-nav {
