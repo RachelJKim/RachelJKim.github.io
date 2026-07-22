@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
+import RockPile from '../components/RockPile'
 import '../styles/home.css'
 
 export default function Home() {
+  const navigate = useNavigate()
   const scrollRef = useRef(null)
   const detailsRef = useRef(null)
   const [scrolled, setScrolled] = useState(false)
+  const [aboutHover, setAboutHover] = useState(false)  // hover preview: white veil
+  const [transitioning, setTransitioning] = useState(false)  // click: full fade + pile-in
 
   useEffect(() => {
     const container = scrollRef.current
@@ -23,15 +27,46 @@ export default function Home() {
     detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  // Hand off to /about exactly once, whichever trigger fires first.
+  const handedOffRef = useRef(false)
+  const goToAbout = () => {
+    if (handedOffRef.current) return
+    handedOffRef.current = true
+    navigate('/about', { state: { fromTransition: true } })
+  }
+
+  // Clicking "About": play the white fade + rock pile-in over the hero, then hand
+  // off to the /about route (which renders the same settled pile — seamless).
+  const startAboutTransition = () => {
+    if (transitioning) return
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      navigate('/about')   // no animation under reduced-motion
+      return
+    }
+    setTransitioning(true)
+    // Fallback: if animationend is delayed/throttled (e.g. a backgrounded tab), still
+    // hand off shortly after the ~1.8s fade so the user is never stranded on the hero.
+    setTimeout(goToAbout, 2100)
+  }
+
+  // Fired when the white sheet finishes fading in (~1.8s, a touch after the pile).
+  const onPortalFaded = (e) => {
+    if (e.target.classList.contains('about-portal__white')) goToAbout()
+  }
+
   return (
     <div className="home-scroll-container" ref={scrollRef}>
       {/* Hero — full-bleed Porto sunset */}
-      <div className="home-hero">
+      <div className={`home-hero ${aboutHover ? 'home-hero--about-hover' : ''}`}>
         {/* Two copies of the same photo, as in the Canva source: an enlarged
             faded one behind, and a crisp one offset over the right. The seam
             down the left is simply the crisp copy's edge. */}
         <img className="hero-photo hero-photo--back" src="/images/backgrounds/background-porto.jpg" alt="" aria-hidden="true" />
         <img className="hero-photo hero-photo--front" src="/images/backgrounds/background-porto.jpg" alt="Sunset over Porto" />
+
+        {/* Hover preview: a faint white veil bleeds in while "About" is hovered. */}
+        <div className="hero-about-veil" aria-hidden="true" />
 
         {/* The eyes straddle the seam */}
         <div className="hero-eyes">
@@ -49,7 +84,16 @@ export default function Home() {
         <nav className="hero-nav" aria-label="Main">
           <span className="hero-nav__rule" aria-hidden="true" />
           <ul>
-            <li><button type="button" onClick={scrollToDetails}>About</button></li>
+            <li>
+              <button
+                type="button"
+                onMouseEnter={() => setAboutHover(true)}
+                onMouseLeave={() => setAboutHover(false)}
+                onClick={startAboutTransition}
+              >
+                About
+              </button>
+            </li>
             <li><Link to="/publications">Research</Link></li>
             <li><Link to="/projects">Projects</Link></li>
             <li className="hero-nav__misc"><a href="#etc">misc</a></li>
@@ -67,6 +111,15 @@ export default function Home() {
           </svg>
         </button>
       </div>
+
+      {/* About transition portal: a white sheet fades in (~1.8s) while the rock
+          pile piles in on top (~1.5s); on fade-end we navigate to /about. */}
+      {transitioning && (
+        <div className="about-portal" onAnimationEnd={onPortalFaded}>
+          <div className="about-portal__white" />
+          <RockPile intro />
+        </div>
+      )}
 
       {/* Details — snaps into view */}
       <div className="home-details" ref={detailsRef}>

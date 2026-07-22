@@ -1,0 +1,9 @@
+{
+  "name": "rock-pile",
+  "private": true,
+  "description": "Interactive rock-pile page. Tests cover the intro pile-in lifecycle.",
+  "scripts": {
+    "test": "node --test",
+    "test:watch": "node --test --watch"
+  }
+}

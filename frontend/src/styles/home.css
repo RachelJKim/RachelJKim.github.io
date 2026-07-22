@@ -258,6 +258,43 @@
   }
 }
 
+/* ---- About: hover preview veil ----
+   Sits above the photos but below the eyes/title/nav (DOM order), so hovering
+   "About" only dims the photo toward white — the text stays crisp. */
+.hero-about-veil {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.home-hero--about-hover .hero-about-veil {
+  opacity: 0.3;
+}
+
+/* ---- About: click transition portal ----
+   A white sheet fades in (~1.8s) while the rock pile piles in on top (~1.5s).
+   The sheet's animationend triggers navigation to /about. */
+.about-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+.about-portal__white {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: aboutWhiteIn 1.8s ease forwards;
+}
+
+@keyframes aboutWhiteIn {
+  to { opacity: 1; }
+}
+
 /* ---- Details ---- */
 
 .home-details {

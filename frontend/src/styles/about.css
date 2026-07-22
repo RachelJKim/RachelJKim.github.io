@@ -1,0 +1,11 @@
+/* About page — full-screen interactive rock pile on white */
+
+.about-stage-page {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Navigation lives in rock-shaped overlay buttons — see AboutNav / about-nav.css. */

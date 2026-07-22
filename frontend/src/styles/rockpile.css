@@ -1,0 +1,31 @@
+/* RockPile — stage geometry. Imported by the component so the styles travel with
+   it wherever it renders (the /about page and the Home transition portal). */
+
+.rock-stagewrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);   /* center the reserved landscape footprint */
+}
+
+.rock-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;     /* JS rotates the stage 270deg from here */
+  touch-action: none;
+  cursor: crosshair;
+  /* No drop-shadow: the pile covers (overflows) the viewport, so any shadow sits
+     off-screen while forcing a large filter layer. */
+}
+
+.rock-stage img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}

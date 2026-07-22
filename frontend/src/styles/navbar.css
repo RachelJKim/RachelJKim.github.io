@@ -158,7 +158,8 @@ a:hover {
   padding-top: 0;
 }
 
-.navbar-wrapper.home-page {
+.navbar-wrapper.home-page,
+.navbar-wrapper.about-page {
   display: none;
 }
 

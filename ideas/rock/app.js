@@ -112,57 +112,43 @@ document.getElementById('reset').onclick = () => {
   for (const r of rocks) { r.ox = r.oy = r.vx = r.vy = r.rot = r.vr = 0; r.img.style.zIndex = ''; }
 };
 
-/* Restart the pile-in. Exposed as window.playRockIntro() so a route change can
-   replay it when this page is entered from another one. */
-let introStart = 0, introing = false;
+// All intro math/lifecycle lives in intro-core.js (DOM-free, so it's unit-testable).
+// IC bundles the tunables above into the shape those functions expect.
+const IC = {
+  FALL: INTRO_FALL, STAGGER: INTRO_STAGGER, JITTER: INTRO_JITTER,
+  SCALE: INTRO_SCALE, DRIFT: INTRO_DRIFT, SPIN: INTRO_SPIN, FADE: INTRO_FADE,
+};
+const intro = RockIntro.createController({ now: () => performance.now() });
+
+/* Start (or restart) the pile-in. Exposed as window.playRockIntro() so a route change can
+   replay it when this page is entered from another one — this always plays, even when the
+   automatic intro is turned off, which is the hook for the React version. */
 function playIntro() {
-  fallOrder.forEach((r, i) => {
-    r.delay = i * INTRO_STAGGER + Math.random() * INTRO_JITTER;
-    r.dur = INTRO_FALL * (0.85 + Math.random() * 0.3);
-    r.dRot = (Math.random() - 0.5) * 2 * INTRO_SPIN;
-    const a = Math.random() * 6.28, d = Math.random() * INTRO_DRIFT;
-    r.dx = Math.cos(a) * d; r.dy = Math.sin(a) * d;
+  RockIntro.assignTiming(fallOrder, Math.random, IC);
+  for (const r of rocks) {
     r.ox = r.oy = r.vx = r.vy = r.rot = r.vr = 0;
     r.sc = INTRO_SCALE;
     r.img.style.opacity = '0';
     r.img.style.zIndex = '';
-  });
-  introStart = performance.now();
-  introing = true;
+  }
+  intro.begin();
 }
 window.playRockIntro = playIntro;
 
-// Long, soft deceleration (close to easeOutCubic) with just a trace of overshoot, so a
-// rock eases onto the ground and barely settles rather than snapping into place.
-const easeLand = t => 1 + 1.15 * Math.pow(t - 1, 3) + 0.15 * Math.pow(t - 1, 2);
-
-function stepIntro(now) {
-  let done = true;
-  for (const r of rocks) {
-    const t = (now - introStart - r.delay) / r.dur;
-    if (t >= 1) { r.sc = 1; r.img.style.opacity = ''; continue; }
-    done = false;
-    if (t <= 0) { r.sc = INTRO_SCALE; continue; }   // still waiting its turn
-    const e = easeLand(t);
-    r.sc = INTRO_SCALE + (1 - INTRO_SCALE) * e;
-    r.ox = r.dx * (1 - e); r.oy = r.dy * (1 - e);
-    r.rot = r.dRot * (1 - e);
-    // Reach full opacity early: a rock spends most of its fall solid, not translucent,
-    // so 123 overlapping cutouts never stack up into haze.
-    r.img.style.opacity = t >= INTRO_FADE ? '1' : (t / INTRO_FADE).toFixed(2);
-  }
-  if (done) introing = false;
-}
-
 function frame(now) {
-  if (introing) {
-    stepIntro(now);
+  if (intro.introing) {
+    let allLanded = true;
     for (const r of rocks) {
-      if (r.sc === INTRO_SCALE && r.img.style.opacity === '0') continue;   // not yet dropped
+      const s = RockIntro.stepRock(r, now, intro.introStart, IC);
+      if (s.phase !== 'landed') allLanded = false;
+      if (s.phase === 'waiting') { r.img.style.opacity = '0'; continue; }   // not yet dropped
+      r.sc = s.scale; r.ox = s.ox; r.oy = s.oy; r.rot = s.rot;
+      r.img.style.opacity = s.phase === 'landed' ? '' : (s.opacity === 1 ? '1' : s.opacity.toFixed(2));
       r.img.style.transform =
         'translate(' + (r.hx + r.ox).toFixed(1) + 'px,' + (r.hy + r.oy).toFixed(1) + 'px)' +
         ' rotate(' + r.rot.toFixed(2) + 'deg) scale(' + r.sc.toFixed(3) + ')';
     }
+    if (allLanded) intro.end();
     requestAnimationFrame(frame);
     return;
   }
@@ -191,29 +177,32 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-// ?intro=0 / ?intro=1 overrides the constant for this visit. Anything else falls through
-// to INTRO_ENABLED. Respect a reduced-motion preference regardless of either.
+// ?intro=0 / ?intro=1 overrides the constant for this visit; otherwise INTRO_ENABLED wins.
+// A reduced-motion preference disables it regardless.
 const introParam = new URLSearchParams(location.search).get('intro');
-const introOn =
-  matchMedia('(prefers-reduced-motion: reduce)').matches ? false :
-  introParam === '0' ? false :
-  introParam === '1' ? true : INTRO_ENABLED;
+const introOn = RockIntro.resolveIntroOn({
+  introParam,
+  enabled: INTRO_ENABLED,
+  reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+});
 
 requestAnimationFrame(frame);
+
+// Registered unconditionally: rAF is frozen while the tab is hidden, so on return the
+// intro's whole duration can look elapsed and the pile snaps to finished. Rebasing the
+// clock resumes it instead. A manually-triggered intro (React route change) needs this too.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) intro.onVisible();
+});
 
 if (introOn) {
   // Hide the pile until the intro starts, so nothing flashes into place first.
   for (const r of rocks) r.img.style.opacity = '0';
   // Wait for the cutouts to decode, otherwise early rocks land as blank gaps.
   Promise.all(rocks.map(r => r.img.decode().catch(() => {}))).then(playIntro);
-
-  // Coming back to the page (bfcache restore) replays the pile-in.
-  window.addEventListener('pageshow', e => { if (e.persisted) playIntro(); });
 }
 
-// requestAnimationFrame is paused while the tab is hidden, so an intro that started (or
-// was queued) in the background would otherwise find its whole duration already elapsed
-// and snap straight to the finished pile. Rebase the clock when the tab comes back.
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && introing) introStart = performance.now();
+// Coming back to the page (bfcache restore) replays the pile-in when it's enabled.
+window.addEventListener('pageshow', e => {
+  if (RockIntro.shouldReplayOnPageshow(e.persisted, introOn)) playIntro();
 });
