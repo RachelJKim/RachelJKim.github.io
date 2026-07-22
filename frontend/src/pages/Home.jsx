@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
 import RockPile from '../components/RockPile'
+import AboutNav from '../components/AboutNav'
 import '../styles/home.css'
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false)
   const [aboutHover, setAboutHover] = useState(false)  // hover preview: white veil
   const [transitioning, setTransitioning] = useState(false)  // click: full fade + pile-in
+  const [portalNav, setPortalNav] = useState(false)          // leaf nav fades in with the pile
 
   useEffect(() => {
     const container = scrollRef.current
@@ -113,11 +115,14 @@ export default function Home() {
       </div>
 
       {/* About transition portal: a white sheet fades in (~1.8s) while the rock
-          pile piles in on top (~1.5s); on fade-end we navigate to /about. */}
+          pile piles in on top (~1.5s); on fade-end we navigate to /about.
+          The leaf nav fades in *with* the pile rather than waiting for /about to
+          mount, so it's already there on arrival instead of popping in after. */}
       {transitioning && (
         <div className="about-portal" onAnimationEnd={onPortalFaded}>
           <div className="about-portal__white" />
-          <RockPile intro />
+          <RockPile intro onIntroStart={() => setPortalNav(true)} />
+          <AboutNav show={portalNav} />
         </div>
       )}
 

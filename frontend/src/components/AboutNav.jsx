@@ -1,47 +1,49 @@
 import { Link } from 'react-router-dom'
 import '../styles/about-nav.css'
 
-/* Nav made of rock-shaped buttons overlaid on the About pile. These are page-space
+/* Nav made of leaf-shaped buttons overlaid on the About pile. These are page-space
    overlays (not part of the rotated physics stage), so they're always upright and
-   horizontal, never repel, and sit wherever we place them. Each is a wide cutout
-   with a bold label and a crisp outline that reads as "pressable". */
+   horizontal, never repel, and sit wherever we place them. Each is a wide leaf cutout
+   with a bold label and a crisp outline that reads as "pressable". A small per-item
+   tilt keeps the four leaves from looking stamped from one mould. */
 
 const ITEMS = [
-  { label: 'Home', to: '/', rock: 'rock-001.png' },
-  { label: 'Research', to: '/publications', rock: 'rock-006.png' },
-  { label: 'Projects', to: '/projects', rock: 'rock-010.png' },
-  { label: 'misc', href: '#etc', rock: 'rock-014.png' },   // placeholder anchor, mirrors the Home nav
+  { label: 'Home', to: '/', tilt: -6 },
+  { label: 'Research', to: '/publications', tilt: 3 },
+  { label: 'Projects', to: '/projects', tilt: -2 },
+  { label: 'misc', href: '#etc', tilt: 7 },   // placeholder anchor, mirrors the Home nav
 ]
 
-function RockButton({ label, rock }) {
+function LeafButton({ label }) {
   return (
     <>
       <img
-        className="rock-btn__rock"
-        src={'/images/rocks/cutouts/' + rock}
+        className="leaf-btn__leaf"
+        src="/images/leaf/leaf.png"
         alt=""
         aria-hidden="true"
         draggable="false"
       />
-      <span className="rock-btn__label">{label}</span>
+      <span className="leaf-btn__label">{label}</span>
     </>
   )
 }
 
 export default function AboutNav({ show = true }) {
   return (
-    <nav className={`rock-nav ${show ? 'rock-nav--show' : ''}`} aria-label="Sections">
-      {ITEMS.map((it) =>
-        it.to ? (
-          <Link key={it.label} to={it.to} className="rock-btn" aria-label={it.label}>
-            <RockButton {...it} />
+    <nav className={`leaf-nav ${show ? 'leaf-nav--show' : ''}`} aria-label="Sections">
+      {ITEMS.map((it) => {
+        const style = { '--tilt': `${it.tilt}deg` }
+        return it.to ? (
+          <Link key={it.label} to={it.to} className="leaf-btn" style={style} aria-label={it.label}>
+            <LeafButton {...it} />
           </Link>
         ) : (
-          <a key={it.label} href={it.href} className="rock-btn" aria-label={it.label}>
-            <RockButton {...it} />
+          <a key={it.label} href={it.href} className="leaf-btn" style={style} aria-label={it.label}>
+            <LeafButton {...it} />
           </a>
         )
-      )}
+      })}
     </nav>
   )
 }
