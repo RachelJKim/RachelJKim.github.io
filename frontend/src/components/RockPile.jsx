@@ -17,6 +17,14 @@ import '../styles/rockpile.css'
 const R = 200, REPEL = 3.2, K = 0.028, DAMP = 0.74
 const CLICK_IMPULSE = 26        // strength of the pop when a rock is clicked
 
+// ---- Wells ----
+// A "well" is a hidden image behind the pile with a soft, *persistent* repel around
+// it, so rocks settle pulled slightly away and the image peeks through — as if
+// something is buried under the stones. Much weaker than the cursor (WELL_REPEL <<
+// REPEL), so hovering opens the gap wider and a cursor-shoved rock can still slide
+// over the image: a soft clearing, never a hard no-rock hole.
+const WELL_REPEL = 0.95
+
 // ---- Intro pile-in ----
 const INTRO_FALL = 620          // ms for a single rock's fall
 const INTRO_STAGGER = 6         // ms between rocks (big ones land first)
@@ -33,10 +41,17 @@ const easeLand = (t) => 1 + 1.15 * Math.pow(t - 1, 3) + 0.15 * Math.pow(t - 1, 2
  * @param {boolean} intro   play the pile-in on mount (default true; skipped under reduced-motion)
  * @param {() => void} onIntroStart  called the moment the pile-in begins
  * @param {() => void} onIntroDone   called once the pile-in finishes
+ * @param {Array<{id,src,xN,yN,rN,imgW,alt}>} wells  hidden peek-through images (see WELL_REPEL).
+ *        xN/yN: viewport-normalized center (0..1). rN: repel radius as a fraction of
+ *        min(vw,vh). imgW: CSS width for the image element.
  */
-export default function RockPile({ intro = true, onIntroStart, onIntroDone }) {
+export default function RockPile({ intro = true, onIntroStart, onIntroDone, wells = [] }) {
   const stageRef = useRef(null)
   const stagewrapRef = useRef(null)
+  const wellsLayerRef = useRef(null)
+  // Serialized so the effect re-runs only when the wells actually change, not on every
+  // parent render that hands it a fresh array literal.
+  const wellsKey = JSON.stringify(wells)
   const onIntroStartRef = useRef(onIntroStart)
   onIntroStartRef.current = onIntroStart
   const onIntroDoneRef = useRef(onIntroDone)
@@ -69,6 +84,11 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone }) {
     // Biggest rocks land first so the pile visibly builds from its base outward.
     const fallOrder = [...rocks].sort((a, b) => b.area - a.area)
 
+    // Wells: parsed from the serialized prop. wcx/wcy (local px centre) and wr (px
+    // radius) are filled in by layout(), which maps each viewport-normalised centre
+    // into the stage's own rotated coordinate space.
+    const wellState = JSON.parse(wellsKey).map((w) => ({ ...w, wcx: 0, wcy: 0, wr: 0 }))
+
     // The pile always COVERS the viewport (no letterboxing), and its orientation
     // matches the viewport so the portrait source needs the least upscaling (sharper):
     //   landscape viewport -> rotate the stage 270deg (portrait source reads landscape)
@@ -100,6 +120,26 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone }) {
         r.img.style.height = (r.h * S) + 'px'
         r.hx = r.x * S;   r.hy = r.y * S      // home top-left (px)
         r.pcx = r.cx * S; r.pcy = r.cy * S    // centroid (px)
+      }
+      // Map each well's viewport-normalised centre into the stage's local space, the
+      // same inversion pos() applies to the cursor. Rotation+translation preserves
+      // distance, so the radius carries over from viewport px unchanged.
+      if (wellState.length) {
+        const rc = stagewrap.getBoundingClientRect()
+        const minVp = Math.min(vw, vh)
+        for (const w of wellState) {
+          // Repel is centred on the focus point (fxN/fyN) when given — lets the clearing
+          // sit on the face rather than the image's geometric centre — else the image centre.
+          const cx = (w.fxN ?? w.xN) * vw, cy = (w.fyN ?? w.yN) * vh
+          if (landscapeMode) {
+            w.wcx = localW - (cy - rc.top)
+            w.wcy = cx - rc.left
+          } else {
+            w.wcx = cx - rc.left
+            w.wcy = cy - rc.top
+          }
+          w.wr = w.rN * minVp
+        }
       }
     }
     layout()
@@ -189,6 +229,17 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone }) {
           const f = (R - d) / R, push = f * f * REPEL * R / r.mass
           r.vx += dx / d * push * 0.12; r.vy += dy / d * push * 0.12
         }
+        // Persistent, gentle repel out of each well — balanced against the home spring,
+        // this settles rocks into a soft clearing that reveals the image behind them.
+        for (const w of wellState) {
+          const wdx = (r.pcx + r.ox) - w.wcx, wdy = (r.pcy + r.oy) - w.wcy
+          const wd = Math.hypot(wdx, wdy) || 0.001
+          if (wd < w.wr) {
+            const wf = (w.wr - wd) / w.wr
+            const wpush = wf * wf * (w.repel ?? WELL_REPEL) * w.wr / r.mass
+            r.vx += wdx / wd * wpush * 0.12; r.vy += wdy / wd * wpush * 0.12
+          }
+        }
         // Spring back home + damping
         r.vx += (-r.ox) * K; r.vy += (-r.oy) * K
         r.vx *= DAMP; r.vy *= DAMP
@@ -247,11 +298,38 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone }) {
       stage.removeEventListener('pointerdown', down)
       while (stage.firstChild) stage.removeChild(stage.firstChild)
     }
-  }, [intro])
+  }, [intro, wellsKey])
 
   return (
-    <div className="rock-stagewrap" ref={stagewrapRef}>
-      <div className="rock-stage" ref={stageRef} />
-    </div>
+    <>
+      {/* Hidden peek-through images — sit behind the pile; the physics loop clears a
+          soft gap around each so they show through the stones. */}
+      {wells.length > 0 && (
+        <div
+          className={`rock-wells${intro ? '' : ' rock-wells--settled'}`}
+          ref={wellsLayerRef}
+          aria-hidden="true"
+        >
+          {wells.map((w) => (
+            <img
+              key={w.id}
+              className="rock-well-img"
+              src={w.src}
+              alt={w.alt || ''}
+              draggable="false"
+              style={{
+                left: `${w.xN * 100}%`,
+                top: `${w.yN * 100}%`,
+                width: w.imgW,
+                transform: `translate(-50%, -50%) rotate(${w.rot || 0}deg)`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+      <div className="rock-stagewrap" ref={stagewrapRef}>
+        <div className="rock-stage" ref={stageRef} />
+      </div>
+    </>
   )
 }

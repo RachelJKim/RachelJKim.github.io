@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
 import RockPile from '../components/RockPile'
 import AboutNav from '../components/AboutNav'
+import { WELLS } from '../data/aboutWells'
 import '../styles/home.css'
 
 export default function Home() {
@@ -116,12 +117,14 @@ export default function Home() {
 
       {/* About transition portal: a white sheet fades in (~1.8s) while the rock
           pile piles in on top (~1.5s); on fade-end we navigate to /about.
-          The leaf nav fades in *with* the pile rather than waiting for /about to
-          mount, so it's already there on arrival instead of popping in after. */}
+          The wells (profile pic + notes) are passed here too, so they're already
+          laid down when the rocks start falling *on top* of them — the concept —
+          instead of popping in only once /about mounts. The leaf nav likewise
+          fades in *with* the pile so it's already there on arrival. */}
       {transitioning && (
         <div className="about-portal" onAnimationEnd={onPortalFaded}>
           <div className="about-portal__white" />
-          <RockPile intro onIntroStart={() => setPortalNav(true)} />
+          <RockPile intro wells={WELLS} onIntroStart={() => setPortalNav(true)} />
           <AboutNav show={portalNav} />
         </div>
       )}

@@ -29,3 +29,40 @@
   user-select: none;
   -webkit-user-drag: none;
 }
+
+/* Give the stage its own stacking level so the pile always paints above the hidden
+   well images below it. */
+.rock-stagewrap { z-index: 1; }
+
+/* Well layer — hidden images sitting behind the pile. Page-space (upright, never
+   rotated with the stage); the physics loop clears a soft gap around each. */
+.rock-wells {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;   /* purely scenery — rocks own all interaction */
+}
+
+.rock-well-img {
+  position: absolute;
+  /* transform (centre + per-well tilt) is set inline by the component. */
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
+  animation: wellFadeIn 0.9s ease both;
+}
+
+@keyframes wellFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Settled arrival (the Home→About handoff): the portal already faded the wells in,
+   so show them instantly at full opacity — no second fade that would flash the
+   photo/notes out and back in at the seam. */
+.rock-wells--settled .rock-well-img { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rock-well-img { animation: none; }
+}

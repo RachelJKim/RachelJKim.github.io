@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import RockPile from '../components/RockPile'
 import AboutNav from '../components/AboutNav'
+import { WELLS } from '../data/aboutWells'
 import '../styles/about.css'
 
 export default function About() {
@@ -23,7 +24,7 @@ export default function About() {
 
   return (
     <div className="about-stage-page">
-      <RockPile intro={!settled} onIntroStart={() => setShowNav(true)} />
+      <RockPile intro={!settled} onIntroStart={() => setShowNav(true)} wells={WELLS} />
       <AboutNav show={showNav} />
     </div>
   )
