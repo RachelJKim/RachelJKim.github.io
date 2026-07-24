@@ -28,9 +28,36 @@
   font-display: swap;
 }
 
+/* Benedict — signature/title wordmark ("rachel j kim") */
+@font-face {
+  font-family: 'Benedict';
+  src: url('/fonts/Benedict-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sanchez — slab-serif captions (home character caption, polaroid email) */
+@font-face {
+  font-family: 'Sanchez';
+  src: url('/fonts/Sanchez-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sanchez';
+  src: url('/fonts/Sanchez-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --font-display: 'TT Hoves Pro', 'Helvetica Neue', Helvetica, sans-serif;
   --font-nav: 'TT Moons', Georgia, serif;
+  --font-signature: 'Benedict', 'Segoe Script', cursive;
+  --font-slab: 'Sanchez', Georgia, serif;
 }
 
 /* Roboto Utility Classes */

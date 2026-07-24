@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import '../styles/googly-eye.css'
 
 // Physics constants lifted from ideas/googly-eyes/googly-eye.html
 const TRAVEL = 0.183   // how far the pupil rolls, as a fraction of eye width
@@ -8,7 +9,7 @@ const ASPECT = 448 / 426
  * A single googly eye whose pupil rolls toward the pointer.
  * `size` is the eye diameter as a CSS length (e.g. "9vw").
  */
-export default function GooglyEye({ size, style, className = '' }) {
+export default function GooglyEye({ size, style, className = '', ...rest }) {
   const eyeRef = useRef(null)
   const pupilRef = useRef(null)
 
@@ -81,6 +82,7 @@ export default function GooglyEye({ size, style, className = '' }) {
       className={`googly-eye ${className}`}
       style={{ width: size, aspectRatio: ASPECT, ...style }}
       aria-hidden="true"
+      {...rest}
     >
       <img className="googly-socket" src="/images/googly/socket.png" alt="" draggable="false" />
       <img ref={pupilRef} className="googly-pupil" src="/images/googly/pupil.png" alt="" draggable="false" />

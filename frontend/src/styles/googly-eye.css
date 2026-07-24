@@ -1,0 +1,30 @@
+/* GooglyEye — component-intrinsic styles. Imported by GooglyEye.jsx so the eye
+   travels with the component wherever it renders (home scene, etc.). Placement
+   (where each eye sits, its size and any tilt) is the consumer's job — set it on
+   the element via the `className`/`style` props. */
+
+.googly-eye {
+  position: absolute;
+  filter: drop-shadow(0 0.03em 0.07em rgba(0, 0, 0, 0.28));
+}
+
+.googly-socket,
+.googly-pupil {
+  position: absolute;
+  user-select: none;
+}
+
+.googly-socket {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.googly-pupil {
+  /* pupil is 55.36% of the socket diameter, centered then offset by JS */
+  top: 50%;
+  left: 50%;
+  width: 55.36%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}

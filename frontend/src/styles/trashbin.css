@@ -1,0 +1,93 @@
+/* TrashBin button — see components/TrashBin.jsx.
+   Only .trashbin-lid ever transforms; the body is a static backdrop. */
+
+.trashbin {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+/* The body image defines the button's box (width from the inline style, height auto). */
+.trashbin-body {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The lid is overlaid exactly on top — same 514×698 canvas, so inset:0 lines it up. */
+.trashbin-lid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  /* pivot on the rim where the lid meets the body (y ≈ 130 / 698 ≈ 18.5%) */
+  transform-origin: 50% 18.5%;
+  transform: translateY(0) rotate(0deg);
+  animation: tb-lid-idle 2.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Idle: rest for most of the cycle, then a quick settling double-bob.
+   translateY is a % of the lid's own height, so the motion scales with `size`. */
+@keyframes tb-lid-idle {
+  0%, 55%  { transform: translateY(0)     rotate(0deg); }
+  63%      { transform: translateY(-4%)   rotate(-3deg); }
+  71%      { transform: translateY(-1.5%) rotate(1.6deg); }
+  79%      { transform: translateY(-3%)   rotate(-1.8deg); }
+  88%      { transform: translateY(-0.6%) rotate(0.6deg); }
+  100%     { transform: translateY(0)     rotate(0deg); }
+}
+
+/* Hover / keyboard focus: livelier, continuous bob to pull the eye. */
+.trashbin:hover .trashbin-lid,
+.trashbin:focus-visible .trashbin-lid {
+  animation: tb-lid-hover 0.9s ease-in-out infinite;
+}
+@keyframes tb-lid-hover {
+  0%, 100% { transform: translateY(-2%) rotate(-1.2deg); }
+  50%      { transform: translateY(-6%) rotate(2deg); }
+}
+
+/* Press: lid flips open, as if to catch what you're tossing. */
+.trashbin:active .trashbin-lid {
+  animation: none;
+  transform: translateY(-9%) rotate(-11deg);
+  transition: transform 0.12s ease-out;
+}
+
+/* Keyboard focus ring on the button itself (lid stays pointer-events:none). */
+.trashbin:focus-visible {
+  outline: 3px solid #2b4de0;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Accessibility: no looping motion, but keep a static lift so it still reads
+   as a raised, pressable lid. */
+@media (prefers-reduced-motion: reduce) {
+  .trashbin-lid {
+    animation: none;
+    transition: transform 0.2s ease;
+  }
+  .trashbin:hover .trashbin-lid,
+  .trashbin:focus-visible .trashbin-lid {
+    animation: none;
+    transform: translateY(-4%) rotate(-3deg);
+  }
+  .trashbin:active .trashbin-lid {
+    transform: translateY(-8%) rotate(-10deg);
+  }
+}

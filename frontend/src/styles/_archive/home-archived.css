@@ -1,0 +1,338 @@
+/* Home page: full-bleed Porto hero + scroll-snap details */
+
+:root {
+  --hero-yellow: #f4e04d;
+  --hero-cream: #f0e9dc;
+  --hero-muted: #a39b8c;
+}
+
+.home-scroll-container {
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+
+  /* hide scrollbar but keep functionality */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.home-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Hero ---- */
+
+.home-hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  scroll-snap-align: start;
+  /* The white the faded copy is composited over (measured off the export). */
+  background: rgb(246, 244, 240);
+
+  /* One unit drives the whole composition: the "Hello, Rachel" cap size.
+     Eye diameters, eye spacing and the "This is" indent are all multiples of
+     it, so the group holds its proportions at any viewport aspect. */
+  --title-size: min(5.85vw, 10.7vh);
+}
+
+/* ---- Frosted band ----
+   Now a real element rather than baked into the photo, so the seam sits where
+   the layout wants it instead of wherever the crop happened to put it. */
+/* ---- Photo layers ----
+   Both are the same file. Offsets and widths are in vw, so the pair scales
+   rigidly with viewport width exactly as the Canva artboard does; the hero's
+   overflow crops them. Values solved by matching each layer against the raw
+   photo (ncc 0.992 and 0.995). */
+.hero-photo {
+  position: absolute;
+  height: auto;              /* let the intrinsic aspect drive height */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* matrix(0.508019, 0, 0, 0.508123, -278.292178, -864.30006) over a 1024.5-unit
+   artboard, masked at fill-opacity 0.75 */
+.hero-photo--back {
+  left: -27.163vw;
+  top: -84.363vw;
+  width: 112.463vw;
+  opacity: 0.75;
+}
+
+/* matrix(0.346392, 0, 0, 0.346371, 297.867555, -404.13482), clipped from x=298
+   — that clip edge is the seam */
+.hero-photo--front {
+  left: 29.076vw;
+  top: -39.447vw;
+  width: 76.674vw;
+}
+
+/* ---- Googly eyes ---- */
+
+/* Placed straight from the SVG artboard. Both eyes are the same size; the
+   right one is rotated 4.15deg, not enlarged. */
+.hero-eyes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.googly-eye {
+  position: absolute;
+  filter: drop-shadow(0 0.03em 0.07em rgba(0, 0, 0, 0.28));
+}
+
+.eye-left {
+  left: 10.681vw;
+  top: 8.846vw;
+}
+
+.eye-right {
+  left: 22.46vw;
+  top: 5.982vw;
+  transform: rotate(4.146deg);
+}
+
+.googly-socket,
+.googly-pupil {
+  position: absolute;
+  user-select: none;
+}
+
+.googly-socket {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.googly-pupil {
+  /* pupil is 55.36% of the socket diameter, centered then offset by JS */
+  top: 50%;
+  left: 50%;
+  width: 55.36%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+/* ---- Title ---- */
+
+.hero-title {
+  position: absolute;
+  left: 19.7%;
+  top: 25%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-size: var(--title-size);
+  font-weight: 800;
+  color: var(--hero-yellow);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0.015em 0.12em rgba(0, 0, 0, 0.3);
+}
+
+/* Indented so it lands over "Rachel" on the line below.
+   4.11em of its own 0.62em size == 2.55 * --title-size. */
+.hero-title__intro {
+  margin-left: 4.11em;
+  font-size: 0.62em;
+  margin-bottom: 0.15em;
+}
+
+.hero-title__name {
+  font-size: 1em;
+  white-space: nowrap;
+}
+
+/* "Kim" trails the big name at a smaller size, baseline-aligned */
+.hero-title__last {
+  font-size: 0.55em;
+  margin-left: 0.35em;
+}
+
+/* ---- Hero nav (About / Research / Projects / misc) ---- */
+
+.hero-nav {
+  position: absolute;
+  left: 57.2%;
+  top: 70.5%;
+  height: 29.5%;
+  display: flex;
+  align-items: stretch;
+  gap: 1.9vw;
+}
+
+.hero-nav__rule {
+  position: relative;
+  flex: 0 0 2px;
+  background: rgba(240, 233, 220, 0.5);
+}
+
+/* the small ring node partway down the rule */
+.hero-nav__rule::after {
+  content: '';
+  position: absolute;
+  top: 49.7%;
+  left: 50%;
+  width: 1.75vw;
+  height: 1.75vw;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(240, 233, 220, 0.75);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.hero-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-nav);
+  font-size: min(2.45vw, 4.4vh);
+  line-height: 1.55;
+}
+
+.hero-nav a,
+.hero-nav button {
+  font: inherit;
+  color: var(--hero-cream);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: inline-block;
+}
+
+.hero-nav a:hover,
+.hero-nav button:hover {
+  color: var(--hero-yellow);
+  transform: translateX(0.4vw);
+}
+
+.hero-nav__misc a {
+  font-size: 0.94em;
+  color: var(--hero-muted);
+}
+
+/* ---- Scroll-down affordance (bouncing chevron) ---- */
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 14%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(240, 233, 220, 0.65);
+  animation: bounce 2s ease infinite;
+  transition: opacity 0.4s ease;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.scroll-indicator:hover {
+  color: var(--hero-yellow);
+}
+
+.scroll-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* ---- About: hover preview veil ----
+   Sits above the photos but below the eyes/title/nav (DOM order), so hovering
+   "About" only dims the photo toward white — the text stays crisp. */
+.hero-about-veil {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.home-hero--about-hover .hero-about-veil {
+  opacity: 0.3;
+}
+
+/* ---- About: click transition portal ----
+   A white sheet fades in (~1.8s) while the rock pile piles in on top (~1.5s).
+   The sheet's animationend triggers navigation to /about. */
+.about-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+.about-portal__white {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: aboutWhiteIn 1.8s ease forwards;
+}
+
+@keyframes aboutWhiteIn {
+  to { opacity: 1; }
+}
+
+/* ---- Details ---- */
+
+.home-details {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+  background-color: rgb(240, 239, 253);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  /* Narrow screens: scale the shared unit up and pull the group left. */
+  .home-hero {
+    --title-size: min(11vw, 8vh);
+  }
+
+  .hero-title {
+    left: 12%;
+    top: 34%;
+  }
+
+  .hero-title__intro {
+    margin-left: 1.6em;
+  }
+
+  .hero-nav {
+    left: 8%;
+    top: 62%;
+    gap: 4vw;
+  }
+
+  .hero-nav ul {
+    font-size: 6.5vw;
+  }
+
+  .hero-nav__rule::after {
+    width: 2.4vw;
+    height: 2.4vw;
+  }
+}

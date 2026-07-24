@@ -1,0 +1,132 @@
+/* Home scene layout editor (dev-only, shown at /?edit). */
+
+/* In edit mode, outline the draggable pieces and flag the selected one. */
+.home-scene.editing [data-edit] {
+  outline: 1px dashed rgba(59, 130, 246, 0.55);
+  outline-offset: 2px;
+  cursor: move;
+  touch-action: none;
+}
+.home-scene.editing [data-edit].is-selected {
+  outline: 2px solid #3b82f6;
+}
+
+.scene-editor {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 9999;
+  width: 232px;
+  padding: 12px 14px 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e2e2e6;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1a1a1e;
+  backdrop-filter: blur(6px);
+}
+
+.se-title {
+  font-weight: 700;
+  font-size: 13px;
+}
+.se-hint {
+  margin: 2px 0 10px;
+  font-size: 11px;
+  color: #6b6b72;
+}
+
+.se-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.se-tab {
+  padding: 3px 8px;
+  font-size: 11px;
+  border: 1px solid #d5d5db;
+  border-radius: 999px;
+  background: #fff;
+  color: #444;
+  cursor: pointer;
+}
+.se-tab.is-active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.se-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 8px;
+  margin-bottom: 12px;
+}
+.se-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: #6b6b72;
+}
+.se-field input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #d5d5db;
+  border-radius: 6px;
+  color: #1a1a1e;
+  background: #fff;
+}
+
+.se-actions {
+  display: flex;
+  gap: 6px;
+}
+.se-actions button {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  background: #1a1a1e;
+  color: #fff;
+  cursor: pointer;
+}
+.se-actions .se-reset {
+  background: #efeff2;
+  color: #b42318;
+}
+
+.se-status {
+  min-height: 14px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #15803d;
+}
+.se-note {
+  margin: 4px 0 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #8a8a90;
+}
+.se-note code {
+  font-size: 10px;
+  background: #f0f0f3;
+  padding: 0 3px;
+  border-radius: 3px;
+}
+.se-link {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #3b82f6;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

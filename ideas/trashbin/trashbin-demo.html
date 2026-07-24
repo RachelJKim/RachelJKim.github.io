@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trash bin button — animation preview</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    gap: 2.5rem;
+    font: 15px/1.5 system-ui, sans-serif;
+    background: #f4f7fb;
+    color: #223;
+  }
+  @media (prefers-color-scheme: dark) { body { background: #10151d; color: #cdd6e4; } }
+  h1 { font-weight: 600; font-size: 1.1rem; margin: 2rem 0 -1rem; }
+  .row { display: flex; align-items: flex-end; gap: 3rem; flex-wrap: wrap; justify-content: center; }
+  .hint { opacity: .6; font-size: .85rem; }
+
+  /* ---- component styles (mirror of frontend/src/styles/trashbin.css) ---- */
+  .trashbin {
+    position: relative; display: inline-block; padding: 0; border: none;
+    background: none; cursor: pointer; line-height: 0;
+    -webkit-tap-highlight-color: transparent; outline: none;
+  }
+  .trashbin-body {
+    display: block; width: 100%; height: auto;
+    pointer-events: none; user-select: none; -webkit-user-drag: none;
+  }
+  .trashbin-lid {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+    pointer-events: none; user-select: none; -webkit-user-drag: none;
+    transform-origin: 50% 18.5%;
+    transform: translateY(0) rotate(0deg);
+    animation: tb-lid-idle 2.8s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes tb-lid-idle {
+    0%, 55%  { transform: translateY(0)     rotate(0deg); }
+    63%      { transform: translateY(-4%)   rotate(-3deg); }
+    71%      { transform: translateY(-1.5%) rotate(1.6deg); }
+    79%      { transform: translateY(-3%)   rotate(-1.8deg); }
+    88%      { transform: translateY(-0.6%) rotate(0.6deg); }
+    100%     { transform: translateY(0)     rotate(0deg); }
+  }
+  .trashbin:hover .trashbin-lid, .trashbin:focus-visible .trashbin-lid {
+    animation: tb-lid-hover 0.9s ease-in-out infinite;
+  }
+  @keyframes tb-lid-hover {
+    0%, 100% { transform: translateY(-2%) rotate(-1.2deg); }
+    50%      { transform: translateY(-6%) rotate(2deg); }
+  }
+  .trashbin:active .trashbin-lid {
+    animation: none; transform: translateY(-9%) rotate(-11deg);
+    transition: transform 0.12s ease-out;
+  }
+  .trashbin:focus-visible { outline: 3px solid #2b4de0; outline-offset: 4px; border-radius: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    .trashbin-lid { animation: none; transition: transform 0.2s ease; }
+    .trashbin:hover .trashbin-lid, .trashbin:focus-visible .trashbin-lid {
+      animation: none; transform: translateY(-4%) rotate(-3deg);
+    }
+    .trashbin:active .trashbin-lid { transform: translateY(-8%) rotate(-10deg); }
+  }
+</style>
+</head>
+<body>
+  <h1>Trash bin button — hover, focus (Tab), and click me</h1>
+  <div class="row">
+    <button type="button" class="trashbin" style="width:90px"  aria-label="Trash">
+      <img class="trashbin-body" src="./trashbin-body.png" alt="" draggable="false" />
+      <img class="trashbin-lid"  src="./trashbin-lid.png"  alt="" draggable="false" />
+    </button>
+    <button type="button" class="trashbin" style="width:160px" aria-label="Trash">
+      <img class="trashbin-body" src="./trashbin-body.png" alt="" draggable="false" />
+      <img class="trashbin-lid"  src="./trashbin-lid.png"  alt="" draggable="false" />
+    </button>
+    <button type="button" class="trashbin" style="width:240px" aria-label="Trash">
+      <img class="trashbin-body" src="./trashbin-body.png" alt="" draggable="false" />
+      <img class="trashbin-lid"  src="./trashbin-lid.png"  alt="" draggable="false" />
+    </button>
+  </div>
+  <p class="hint">Same component at 90 / 160 / 240 px — the bob scales with size. Motion is CSS only.</p>
+</body>
+</html>
