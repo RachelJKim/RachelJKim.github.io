@@ -27,6 +27,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'TT Moons';
+  src: url('/fonts/TTMoons-LightItalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
 
 /* Benedict — signature/title wordmark ("rachel j kim") */
 @font-face {

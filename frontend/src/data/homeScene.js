@@ -11,14 +11,19 @@ export const DEFAULT_LAYOUT = {
   character: { leftVw: 23.7, topVh: 61,   widthVw: 18.5 },
   eyeL:      { leftCqw: -1.8, topCqw: 18.3, sizeCqw: 51,   rot: 0 },
   eyeR:      { leftCqw: 53.9, topCqw: 8.6,  sizeCqw: 50.5, rot: 4 },
-  caption:   { leftVw: 23.8, topVh: 92.5, fontVw: 1.7 },
-  notes:     { leftVw: 73.5, topVh: 45.3, widthVw: 50, rot: 1 },
+  caption:   { leftVw: 24.3, topVh: 90.2, fontVw: 1.7 },
+  notes:     { leftVw: 70,   topVh: 48.4, widthVw: 46.5, rot: 1.5 },
   // The intro text overlaid on the notes paper. Positioned in cqw (% of the notes
   // group's width) so it drags/scales with the paper.
-  notesText: { leftCqw: 8.5, topCqw: 22.9, widthCqw: 59, rot: -1.5 },
-  trash:     { leftVw: 91.9, topVh: 86.8, widthVw: 6.5, rot: -3 },
-  // Objects the bin spits out when clicked. Their placements are where they land.
-  objTissue: { leftVw: 51.5, topVh: 77.1, widthVw: 10,  rot: -10 },
+  notesText: { leftCqw: 12.6, topCqw: 22.1, widthCqw: 59, rot: -1.5 },
+  // Profile-picture CV link: the polaroid + its "curriculum vitae" text (grouped;
+  // hover highlights the text, click opens the CV). cvText is placed in cqw relative
+  // to the cv group, like notesText is to notes.
+  cv:        { leftVw: 79.5, topVh: 41.5, widthVw: 17.5, rot: 2.5 },
+  cvText:    { leftCqw: 45.3, topCqw: 92.2, fontCqw: 5, rot: 0 },
+  trash:     { leftVw: 93.1, topVh: 87.9, widthVw: 6.5, rot: 0 },
+  // Nav objects — always-visible clickable buttons placed around the bin.
+  objTissue: { leftVw: 49,   topVh: 78.5, widthVw: 10.5, rot: -10 },
   objRock:   { leftVw: 83.4, topVh: 73.6, widthVw: 7.5, rot: 8 },
   objPet:    { leftVw: 51.5, topVh: 24.8, widthVw: 10,  rot: -3 },
 }
@@ -32,6 +37,8 @@ export const FIELDS = {
   caption:   ['leftVw', 'topVh', 'fontVw'],
   notes:     ['leftVw', 'topVh', 'widthVw', 'rot'],
   notesText: ['leftCqw', 'topCqw', 'widthCqw', 'rot'],
+  cv:        ['leftVw', 'topVh', 'widthVw', 'rot'],
+  cvText:    ['leftCqw', 'topCqw', 'fontCqw', 'rot'],
   trash:     ['leftVw', 'topVh', 'widthVw', 'rot'],
   objTissue: ['leftVw', 'topVh', 'widthVw', 'rot'],
   objRock:   ['leftVw', 'topVh', 'widthVw', 'rot'],

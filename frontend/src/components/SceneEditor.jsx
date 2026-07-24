@@ -1,25 +1,64 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { FIELDS } from '../data/homeScene'
 import '../styles/scene-editor.css'
 
 /* Dev-only layout editor for the Home scene. Rendered by Home when the URL has
    ?edit. Drag elements in the scene to move them; use the inputs here for fine
    control; Save persists to this browser, Copy JSON gives you the object to paste
-   into data/homeScene.js as the committed default. */
+   into data/homeScene.js as the committed default. The panel itself is draggable
+   (by its header) so it doesn't block the elements behind it. */
 export default function SceneEditor({ layout, selected, onSelect, onChange, onSave, onCopy, onRevert, onDefaults }) {
   const [status, setStatus] = useState('')
+  const [pos, setPos] = useState(null) // {left, top} once dragged; null = default (top-right)
+  const [collapsed, setCollapsed] = useState(false)
+  const dragRef = useRef(null)
   const flash = (msg) => {
     setStatus(msg)
     setTimeout(() => setStatus(''), 1600)
   }
 
+  const startPanelDrag = (e) => {
+    if (e.target.closest('.se-collapse')) return // let the collapse button click through
+    e.preventDefault()
+    const panel = e.currentTarget.closest('.scene-editor').getBoundingClientRect()
+    dragRef.current = { dx: e.clientX - panel.left, dy: e.clientY - panel.top }
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+  }
+  const onPanelDrag = (e) => {
+    const d = dragRef.current
+    if (!d) return
+    const left = Math.max(4, Math.min(window.innerWidth - 60, e.clientX - d.dx))
+    const top = Math.max(4, Math.min(window.innerHeight - 40, e.clientY - d.dy))
+    setPos({ left, top })
+  }
+  const endPanelDrag = (e) => { dragRef.current = null; e.currentTarget.releasePointerCapture?.(e.pointerId) }
+
   const keys = Object.keys(layout)
   const fields = FIELDS[selected] || []
 
   return (
-    <div className="scene-editor">
-      <div className="se-title">Layout editor</div>
-      <p className="se-hint">Drag anything in the scene, or nudge values below.</p>
+    <div
+      className={`scene-editor${collapsed ? ' is-collapsed' : ''}`}
+      style={pos ? { left: `${pos.left}px`, top: `${pos.top}px`, right: 'auto' } : undefined}
+    >
+      <div
+        className="se-header"
+        onPointerDown={startPanelDrag}
+        onPointerMove={onPanelDrag}
+        onPointerUp={endPanelDrag}
+      >
+        <span className="se-grip" aria-hidden="true">⠿</span>
+        <span className="se-title">Layout editor</span>
+        <button
+          className="se-collapse"
+          title={collapsed ? 'Expand' : 'Collapse'}
+          onClick={() => setCollapsed((c) => !c)}
+        >
+          {collapsed ? '▢' : '—'}
+        </button>
+      </div>
+      <div className="se-body">
+      <p className="se-hint">Drag the header to move me. Drag anything in the scene, or nudge below.</p>
 
       <div className="se-tabs">
         {keys.map((k) => (
@@ -67,6 +106,7 @@ export default function SceneEditor({ layout, selected, onSelect, onChange, onSa
           load file defaults
         </button>
       </p>
+      </div>
     </div>
   )
 }

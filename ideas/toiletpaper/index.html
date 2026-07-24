@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications — Rachel Kim</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<main class="stage" id="stage">
+
+  <!-- ── Decor: the tissue ─────────────────────────────── -->
+  <div class="decor" aria-hidden="true">
+    <img class="sheet"        src="assets/toiletpaper.png" alt="">
+    <img class="roll roll--b" src="assets/toiletpaper.png" alt="">
+  </div>
+
+  <!-- ── Left label, hung between the two rolls ────────── -->
+  <p class="kicker" aria-hidden="true">
+    <span>Conference</span>
+    <span class="amp">&amp;</span>
+    <span>Journal</span>
+  </p>
+
+  <h1 class="pagetitle">Publications</h1>
+
+  <!-- ── The scrollport: publications pass through it ──── -->
+  <div class="port" id="port" tabindex="0" role="region" aria-label="Publications, scrollable">
+    <ol class="list" id="list"></ol>
+  </div>
+
+  <p class="hint" id="hint" aria-hidden="true">scroll</p>
+
+</main>
+
+<script src="js/publications.js"></script>
+</body>
+</html>

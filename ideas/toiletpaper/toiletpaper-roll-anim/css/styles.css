@@ -1,0 +1,243 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Publications
+
+   Everything is expressed in design units from the 1024.5 x 576 artboard.
+   --s converts one unit to pixels and is the only scaling knob.
+
+   The geometry variables in :root are the single source of truth: js/roll.js
+   reads them back out of the computed style, so changing a number here moves
+   both the paper and the script that positions things on it.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* TT Moons if you drop the .otf files into fonts/, Playfair Display if not,
+   so the page never falls back to Times. */
+@font-face{
+  font-family:"TT Moons"; font-weight:400; font-display:swap;
+  src:url("../fonts/TT_Moons_Trial_Regular.otf") format("opentype"),
+      url("../fonts/TT Moons Trial Regular.otf") format("opentype");
+}
+@font-face{
+  font-family:"TT Moons"; font-weight:500; font-display:swap;
+  src:url("../fonts/TT_Moons_Trial_Medium.otf") format("opentype"),
+      url("../fonts/TT_Moons_Trial_DemiBold.otf") format("opentype");
+}
+@font-face{
+  font-family:"TT Moons"; font-weight:700; font-display:swap;
+  src:url("../fonts/TT_Moons_Trial_Bold.otf") format("opentype"),
+      url("../fonts/TT Moons Trial Bold.otf") format("opentype");
+}
+
+:root{
+  /* one design unit -> pixels */
+  --s: min(calc((100vw - 72px) / 1024.5), 1.75px);
+
+  --ink:#000;
+  --pencil:#b4b4b4;        /* the hand-drawn frame grey, sampled from the SVG */
+  --muted:#9a9a9a;         /* entries that have scrolled past */
+  --paper:#fff;            /* the page */
+  --sheet:#f4f3f0;         /* the tissue */
+
+  /* type sizes, design units */
+  --fs-title:62.1; --fs-kicker:27.9; --fs-venue:17.6;
+  --fs-name:18.7;  --fs-authors:17.2; --fs-links:16.8;
+
+  /* entry rhythm — tune these to re-space the list */
+  --gap-title:1; --gap-authors:4; --gap-links:4; --pad-rule:5; --gap-entry:5.75;
+
+  /* ── geometry, also read by js/roll.js ──────────────────────────
+     Derived from the photograph so the paper is 159.4u wide; the frame
+     then clears it by 6.4u a side and reads as one panel of the roll. */
+  --roll-w:281.96;  --roll-h:240.60;
+  --rail-l:54.14;   --rail-w:162.41;
+  --frame-l:62.0;   --frame-w:146.6;  --frame-h:91.2;
+  --lead:256.6;     /* first entry: clears the roll by 16u */
+  --tuck:10.5;      /* how far the rail hides behind the cylinder */
+  --tail-h:30.1;    /* the torn end */
+  --tail-gap:8;     /* bare paper after the last entry */
+  --perf-lift:11;   /* perforation sits this far above its entry */
+  --cyl-x:27.8;     --cyl-y:85.7;  --cyl-w:195.5; --cyl-h:156.4;
+  --grain-tile:120.3; --cloud-tile:175.2;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"TT Moons","Playfair Display","Times New Roman",serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+.stage{
+  display:grid;
+  grid-template-columns:calc(var(--s) * var(--roll-w)) minmax(0,1fr);
+  gap:0 calc(var(--s) * 52);
+  width:calc(var(--s) * 1024.5); margin:0 auto;
+  padding-bottom:calc(var(--s) * 120);
+  align-items:start;
+}
+
+/* ═══ the roll ═══════════════════════════════════════════════════ */
+
+.railcol{position:relative;align-self:stretch}
+
+/* The paper is ONE element of any height. Nothing is tiled that would
+   show a repeat: the grain and cloud are seamless by construction, and
+   the vertical shading — the shadow the roll casts on the sheet — is a
+   single gradient in px, so it never resets no matter how long the page. */
+.rail{
+  position:absolute; z-index:1;
+  left:calc(var(--s) * var(--rail-l)); width:calc(var(--s) * var(--rail-w));
+  top:calc(var(--s) * (var(--roll-h) - var(--tuck)));   /* behind the cylinder */
+  bottom:0;
+  background-color:var(--sheet);
+  background-image:
+    url("../assets/grain.png"),
+    url("../assets/cloud.png"),
+    linear-gradient(to bottom,
+      rgba(22,20,16,.238) calc(var(--s) * 10.5), rgba(22,20,16,.236) calc(var(--s) * 21.0),
+      rgba(22,20,16,.223) calc(var(--s) * 31.6), rgba(22,20,16,.183) calc(var(--s) * 42.1),
+      rgba(22,20,16,.128) calc(var(--s) * 52.6), rgba(22,20,16,.095) calc(var(--s) * 63.1),
+      rgba(22,20,16,.065) calc(var(--s) * 73.7), rgba(22,20,16,.039) calc(var(--s) * 84.2),
+      rgba(22,20,16,.018) calc(var(--s) * 94.7), rgba(22,20,16,.003) calc(var(--s) * 105.2),
+      rgba(22,20,16,0)    calc(var(--s) * 168.4)),
+    linear-gradient(90deg,
+      rgba(22,20,16,.13) 0, rgba(22,20,16,0) calc(var(--s) * 6),
+      rgba(22,20,16,0) calc(100% - var(--s) * 7), rgba(22,20,16,.16) 100%);
+  background-repeat:repeat, repeat, no-repeat, no-repeat;
+  background-size:
+    calc(var(--s) * var(--grain-tile)) calc(var(--s) * var(--grain-tile)),
+    calc(var(--s) * var(--cloud-tile)) calc(var(--s) * var(--cloud-tile)),
+    100% 100%, 100% 100%;
+  background-blend-mode:multiply, multiply, normal, normal;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 1.5px,#000 calc(100% - 1.5px),transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 1.5px,#000 calc(100% - 1.5px),transparent 100%);
+  filter:drop-shadow(0 0 calc(var(--s) * 9) rgba(22,20,16,.09));
+}
+
+/* The tail is not a photograph. It is the same paper as the rail, with the
+   grain's phase carried across the join by js/roll.js, cut to the torn
+   silhouette. Identical source means there is nothing to blend. */
+.tail{
+  position:absolute; z-index:3;
+  left:calc(var(--s) * var(--rail-l)); width:calc(var(--s) * var(--rail-w));
+  height:calc(var(--s) * var(--tail-h));
+  background-color:var(--sheet);
+  background-image:
+    url("../assets/grain.png"),
+    url("../assets/cloud.png"),
+    linear-gradient(90deg,
+      rgba(22,20,16,.13) 0, rgba(22,20,16,0) calc(var(--s) * 6),
+      rgba(22,20,16,0) calc(100% - var(--s) * 7), rgba(22,20,16,.16) 100%);
+  background-repeat:repeat, repeat, no-repeat;
+  background-size:
+    calc(var(--s) * var(--grain-tile)) calc(var(--s) * var(--grain-tile)),
+    calc(var(--s) * var(--cloud-tile)) calc(var(--s) * var(--cloud-tile)),
+    100% 100%;
+  background-blend-mode:multiply, multiply, normal;
+  -webkit-mask:url("../assets/tearmask.png") no-repeat 0 0 / 100% 100%;
+          mask:url("../assets/tearmask.png") no-repeat 0 0 / 100% 100%;
+  filter:drop-shadow(0 calc(var(--s) * 1.5) calc(var(--s) * 6) rgba(22,20,16,.10));
+}
+
+/* one perforation and one teaser frame per publication, placed by roll.js */
+.perf{
+  position:absolute; z-index:2; height:0;
+  left:calc(var(--s) * var(--rail-l)); width:calc(var(--s) * var(--rail-w));
+}
+.perf::before{
+  content:""; position:absolute; left:calc(var(--s) * 6); right:calc(var(--s) * 6);
+  top:0; height:1.6px;
+  background:repeating-linear-gradient(90deg, rgba(22,20,16,.40) 0 4px, transparent 4px 10px);
+}
+.perf::after{
+  content:""; position:absolute; left:calc(var(--s) * 6); right:calc(var(--s) * 6);
+  top:1.6px; height:calc(var(--s) * 4);
+  background:linear-gradient(rgba(22,20,16,.11), transparent);
+}
+
+.frame{
+  position:absolute; z-index:2; overflow:hidden;
+  left:calc(var(--s) * var(--frame-l));
+  width:calc(var(--s) * var(--frame-w)); height:calc(var(--s) * var(--frame-h));
+  border:1.2px solid var(--pencil); border-radius:2px;
+  background:rgba(255,255,255,.34);
+}
+.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.frame b{
+  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+  text-align:center; font-weight:400; font-style:italic;
+  font-size:calc(var(--s) * 13); color:var(--pencil);
+}
+
+.head{position:sticky;top:0;z-index:4;width:100%;height:calc(var(--s) * var(--roll-h))}
+.head::before{content:"";position:absolute;inset:0;background:var(--paper)}  /* hides the rail above the roll */
+.head img{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* clipped to the cylinder's own silhouette, so the turning texture stops
+   where the roll does instead of filling its bounding box */
+#spin{
+  position:absolute; mix-blend-mode:multiply; pointer-events:none;
+  left:calc(var(--s) * var(--cyl-x)); top:calc(var(--s) * var(--cyl-y));
+  width:calc(var(--s) * var(--cyl-w)); height:calc(var(--s) * var(--cyl-h));
+  -webkit-mask:url("../assets/cylmask.png") no-repeat 0 0 / 100% 100%;
+          mask:url("../assets/cylmask.png") no-repeat 0 0 / 100% 100%;
+}
+
+.kicker{
+  position:absolute; z-index:2;
+  left:calc(var(--s) * var(--cyl-x)); width:calc(var(--s) * var(--cyl-w));
+  top:calc(var(--s) * 163); transform:translateY(-50%);
+  text-align:center; font-size:calc(var(--s) * var(--fs-kicker)); line-height:1.24;
+}
+.kicker .amp{font-style:italic}
+
+/* ═══ the list ═══════════════════════════════════════════════════ */
+
+.col{padding-top:calc(var(--s) * 56)}
+
+.pagetitle{
+  font-size:calc(var(--s) * var(--fs-title));
+  font-weight:400; line-height:.92; letter-spacing:-.012em;
+}
+.meta{
+  margin-top:calc(var(--s) * 16); padding-top:calc(var(--s) * 9);
+  border-top:1px solid var(--pencil);
+  font-size:calc(var(--s) * var(--fs-links)); font-style:italic; color:var(--muted);
+}
+
+.list{list-style:none}
+
+.pub{
+  min-height:calc(var(--s) * 103);        /* never shorter than a teaser frame */
+  padding-bottom:calc(var(--s) * var(--pad-rule));
+  margin-bottom:calc(var(--s) * var(--gap-entry));
+  border-bottom:1px dashed var(--pencil);
+  color:var(--ink); transition:color .35s ease;
+}
+.pub.is-out{color:var(--muted)}
+
+.pub .pub-venue  {font-size:calc(var(--s) * var(--fs-venue));font-weight:700}
+.pub .pub-title  {font-size:calc(var(--s) * var(--fs-name));font-weight:400;line-height:1.3;
+                  margin-top:calc(var(--s) * var(--gap-title))}
+.pub .pub-authors{font-size:calc(var(--s) * var(--fs-authors));font-style:italic;
+                  margin-top:calc(var(--s) * var(--gap-authors))}
+.pub .pub-authors .me{text-decoration:underline;text-underline-offset:.22em}
+.pub .pub-links  {font-size:calc(var(--s) * var(--fs-links));font-style:italic;
+                  margin-top:calc(var(--s) * var(--gap-links))}
+.pub .pub-links a{color:inherit;text-decoration:none;padding:0 .18em;border-radius:2px}
+.pub .pub-links a:hover,
+.pub .pub-links a:focus-visible{outline:1px solid var(--ink);outline-offset:1px}
+
+/* ═══ small screens: the roll steps aside ════════════════════════ */
+
+@media (max-width:760px){
+  :root{--s:calc((100vw - 40px) / 420)}
+  .stage{grid-template-columns:1fr;width:auto;padding:0 20px 60px}
+  .railcol{display:none}
+  .col{padding-top:calc(var(--s) * 30)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #spin{opacity:.5}
+  .pub{transition:none}
+}

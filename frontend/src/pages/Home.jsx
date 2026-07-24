@@ -14,6 +14,8 @@ const TRASH_OBJECTS = [
   { key: 'objRock', src: '/images/trashbin/nav-rock.png', label: 'Misc', to: '/misc' },
 ]
 
+const CV_URL = 'https://docs.google.com/document/d/1gHNZp9hdkjh8tue9ZRP-6wNHoDDXblbBZcAo8HiCfN8/edit?usp=sharing'
+
 /* Home — a single full-screen "desk" scene from Rachel's wireframe. Element
    positions/sizes come from data/homeScene.js so they can be tuned live at
    /?edit (drag + the SceneEditor panel). Positions are fed to CSS as custom
@@ -26,14 +28,14 @@ export default function Home() {
 
   const [layout, setLayout] = useState(loadLayout)
   const [selected, setSelected] = useState('character')
-  const [spat, setSpat] = useState(false) // has the bin spat its objects out?
   const characterRef = useRef(null)
   const notesRef = useRef(null)
+  const cvRef = useRef(null)
   const dragRef = useRef(null)
 
   // Elements positioned in cqw *inside* another element drag relative to that
   // parent's width (rather than in vw/vh against the viewport).
-  const REL_PARENT = { eyeL: characterRef, eyeR: characterRef, notesText: notesRef }
+  const REL_PARENT = { eyeL: characterRef, eyeR: characterRef, notesText: notesRef, cvText: cvRef }
 
   useEffect(() => {
     document.body.classList.add('home-scene-body')
@@ -96,10 +98,12 @@ export default function Home() {
   const cap = layout.caption
   const n = layout.notes
   const nt = layout.notesText
+  const cvg = layout.cv
+  const cvt = layout.cvText
   const tr = layout.trash
 
   return (
-    <div className={`home-scene${editMode ? ' editing' : ''}${spat ? ' spat' : ''}`}>
+    <div className={`home-scene${editMode ? ' editing' : ''}`}>
       {/* Title */}
       <h1
         className={`hs-title${sel('title')}`}
@@ -144,16 +148,15 @@ export default function Home() {
         ask me about rachel !
       </p>
 
-      {/* Notes: crumpled-paper + polaroid background (email is baked into the image),
-          with the intro text overlaid on top — a separately-placeable transparent
-          SVG whose "HCITechLab" is a hover link. */}
+      {/* Notes: crumpled-paper background with the intro text overlaid on top — a
+          separately-placeable transparent SVG whose "HCITechLab" is a hover link. */}
       <div
         ref={notesRef}
         className={`hs-notes${sel('notes')}`}
         style={{ '--x': `${n.leftVw}vw`, '--y': `${n.topVh}vh`, '--w': `${n.widthVw}vw`, '--rot': `${n.rot || 0}deg` }}
         {...dragProps('notes')}
       >
-        <img className="hs-notes-bg" src="/images/home/home-notes.png" alt="" draggable="false" />
+        <img className="hs-notes-bg" src="/images/home/notes-paper.png" alt="" draggable="false" />
         <div
           className={`hs-notes-text${sel('notesText')}`}
           style={{ left: `${nt.leftCqw}cqw`, top: `${nt.topCqw}cqw`, width: `${nt.widthCqw}cqw`, transform: `rotate(${nt.rot || 0}deg)` }}
@@ -177,18 +180,39 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trashbin — lid opens on hover; a click spits the objects out */}
+      {/* CV: the profile polaroid + "curriculum vitae" text, together a link to the
+          CV. Hover highlights the text; click opens it. (Nav suppressed while editing.) */}
+      <a
+        ref={cvRef}
+        className={`hs-cv${sel('cv')}`}
+        style={{ '--x': `${cvg.leftVw}vw`, '--y': `${cvg.topVh}vh`, '--w': `${cvg.widthVw}vw`, '--rot': `${cvg.rot || 0}deg` }}
+        href={CV_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Rachel's CV (opens in a new tab)"
+        onClick={(e) => { if (editMode) e.preventDefault() }}
+        {...dragProps('cv')}
+      >
+        <img className="hs-cv-img" src="/images/home/profile-polaroid.png" alt="Rachel at her graduation" draggable="false" />
+        <span
+          className={`hs-cv-text${sel('cvText')}`}
+          style={{ left: `${cvt.leftCqw}cqw`, top: `${cvt.topCqw}cqw`, fontSize: `${cvt.fontCqw}cqw`, '--rot': `${cvt.rot || 0}deg` }}
+          {...dragProps('cvText')}
+        >
+          curriculum vitae (Jul. 2026)
+        </span>
+      </a>
+
+      {/* Trashbin — decorative; the nav objects sit around it. Lid opens on hover. */}
       <TrashBin
         className={`hs-trash${sel('trash')}`}
         style={{ '--x': `${tr.leftVw}vw`, '--y': `${tr.topVh}vh`, '--w': `${tr.widthVw}vw`, '--rot': `${tr.rot || 0}deg` }}
         label="Trash"
-        onClick={editMode ? undefined : () => setSpat((s) => !s)}
         {...dragProps('trash')}
       />
 
-      {/* Objects the bin spits out — nav buttons. Hidden in the bin until a click;
-          shown (and draggable) in edit mode so their landing spots can be placed. */}
-      {TRASH_OBJECTS.map((o, i) => {
+      {/* Nav objects — always visible, clickable buttons (draggable in edit mode). */}
+      {TRASH_OBJECTS.map((o) => {
         const obj = layout[o.key]
         return (
           <button
@@ -202,9 +226,6 @@ export default function Home() {
               '--y': `${obj.topVh}vh`,
               '--w': `${obj.widthVw}vw`,
               '--rot': `${obj.rot || 0}deg`,
-              '--bin-dx': `${(tr.leftVw - obj.leftVw).toFixed(1)}vw`,
-              '--bin-dy': `${(tr.topVh - obj.topVh).toFixed(1)}vh`,
-              transitionDelay: `${(i * 0.06).toFixed(2)}s`,
             }}
             {...dragProps(o.key)}
           >

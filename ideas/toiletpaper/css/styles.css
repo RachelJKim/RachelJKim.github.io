@@ -1,0 +1,346 @@
+/* ============================================================
+   Publications — Rachel Kim
+   Geometry is transcribed from the source SVG artboard,
+   which is 1024.5 x 576 design units. Every number below is
+   in those units, multiplied by --s to fit the viewport.
+   ============================================================ */
+
+@font-face {
+  font-family: "TT Moons";
+  src: url("../fonts/TT_Moons_Trial_Thin.otf") format("opentype");
+  font-weight: 100; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "TT Moons";
+  src: url("../fonts/TT_Moons_Trial_Thin_Italic.otf") format("opentype");
+  font-weight: 100; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "TT Moons";
+  src: url("../fonts/TT_Moons_Trial_Light.otf") format("opentype");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "TT Moons";
+  src: url("../fonts/TT_Moons_Trial_Light_Italic.otf") format("opentype");
+  font-weight: 300; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "TT Moons";
+  src: url("../fonts/TT_Moons_Trial_Regular.otf") format("opentype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* one design unit, expressed in px. 1.8px cap keeps 4K sane. */
+  --s: min(calc(100vw / 1024.5), calc(100vh / 576), 1.8px);
+
+  --ink:    #000;
+  --pencil: #b4b4b4;   /* the hand-drawn frame grey, sampled from the SVG */
+  --muted:  #9a9a9a;   /* entries that have left the tissue */
+  --paper:  #fff;
+
+  /* type sizes, in design units */
+  --fs-title:   62.1;
+  --fs-kicker:  27.9;
+  --fs-venue:   17.6;
+  --fs-name:    18.7;
+  --fs-authors: 17.2;
+  --fs-links:   16.8;
+
+  /* entry rhythm — tune these to re-space the list */
+  --gap-title:   -1;
+  --gap-authors: 4.6;
+  --gap-links:   4.6;
+  --pad-rule:    5.5;
+  --gap-entry:   8.15;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+body {
+  font-family: "TT Moons", "Times New Roman", serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage {
+  position: relative;
+  width:  calc(var(--s) * 1024.5);
+  height: calc(var(--s) * 576);
+  overflow: hidden;
+}
+
+/* ── the tissue ─────────────────────────────────────────── */
+
+.decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.decor img { position: absolute; display: block; }
+
+/* two small rolls pinned to the top edge, label hung between them */
+.roll--b {
+  left: calc(var(--s) * 300); top: 0;
+  width:  calc(var(--s) * 53.3);
+  height: calc(var(--s) * 85.9);
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* the sheet hangs straight down. The roll carries the label,
+   and the paper runs off the bottom edge so frames can scroll
+   along it. Sheet is centred on x = 139.7, same as the frames. */
+.sheet {
+  left:  calc(var(--s) * 3.9);
+  top:   calc(var(--s) * -40);
+  width: calc(var(--s) * 282.4);
+  height: auto;
+}
+
+/* ── headings ───────────────────────────────────────────── */
+
+.kicker {
+  position: absolute;
+  left: 0; top: calc(var(--s) * 42.4);
+  width: calc(var(--s) * 263);      /* centres the stack on x = 131.5 */
+  margin: 0;
+  text-align: center;
+  font-weight: 400;
+  font-size: calc(var(--s) * var(--fs-kicker));
+  line-height: calc(var(--s) * 33);
+}
+.kicker span { display: block; }
+.kicker .amp { font-weight: 300; }
+
+.pagetitle {
+  position: absolute;
+  right: calc(var(--s) * 77.5);     /* right edge lands on x = 947 */
+  top: calc(var(--s) * 47);
+  margin: 0;
+  font-weight: 400;
+  font-size: calc(var(--s) * var(--fs-title));
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ── the scrollport ─────────────────────────────────────── */
+/* Publications travel through this window. Entries fade in at
+   the top edge and fade out at the bottom, so whatever is in
+   the tissue reads as the current one.                        */
+
+.port {
+  position: absolute;
+  left:  calc(var(--s) * 229);
+  top:   calc(var(--s) * 172);
+  width: calc(var(--s) * 737);      /* 229 -> 966, matching the rules */
+  height: calc(var(--s) * 404);     /* down to the bottom edge */
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+
+  scroll-snap-type: y proximity;
+  scroll-padding-top: calc(var(--s) * 12);
+
+  --fade-in:  calc(var(--s) * 12);
+  --fade-out: calc(var(--s) * 56);
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0,
+      #000 var(--fade-in),
+      #000 calc(100% - var(--fade-out)),
+      transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent 0,
+      #000 var(--fade-in),
+      #000 calc(100% - var(--fade-out)),
+      transparent 100%);
+
+  scrollbar-width: none;
+}
+.port::-webkit-scrollbar { width: 0; height: 0; }
+.port:focus-visible { outline: 1px solid var(--ink); outline-offset: calc(var(--s) * 4); }
+
+.list {
+  margin: 0;
+  padding: calc(var(--s) * 12) 0 calc(var(--s) * 300) 0;
+  list-style: none;
+}
+
+/* ── one publication ────────────────────────────────────── */
+
+.pub {
+  position: relative;
+  scroll-snap-align: start;
+  color: var(--muted);
+  transition: color .4s ease;
+}
+.pub.is-active { color: var(--ink); }
+
+/* One hand-drawn frame per paper, sitting on the sheet.
+   Drop a `teaser` path into the data and it fills this box. */
+.pub-teaser {
+  position: absolute;
+  left: calc(var(--s) * 6.4);          /* lands the frame on x = 66.4 */
+  top:  calc(var(--s) * 13.5);
+  width:  calc(var(--s) * 146.6);
+  height: calc(var(--s) * 91.2);
+}
+.pub-teaser img { position: absolute; display: block; }
+.pub-teaser .teaser-shot {
+  left: calc(var(--s) * 6); top: calc(var(--s) * 6);
+  width:  calc(100% - var(--s) * 12);
+  height: calc(100% - var(--s) * 12);
+  object-fit: cover;
+}
+.pub-teaser .teaser-frame { left: 0; top: 0; width: 100%; height: 100%; }
+
+.pub-body {
+  margin-left: calc(var(--s) * 169);    /* text column begins on x = 229 */
+  padding: 0 0 calc(var(--s) * var(--pad-rule)) calc(var(--s) * 6.2);
+  margin-bottom: calc(var(--s) * var(--gap-entry));
+  border-bottom: calc(var(--s) * 0.75) dashed var(--ink);
+}
+.pub:last-child .pub-body { border-bottom: 0; }
+
+.pub-body > * { margin: 0; font-weight: 400; }
+
+.pub .pub-venue {
+  font-size: calc(var(--s) * var(--fs-venue));
+  line-height: 1.3;
+}
+
+.pub .pub-title {
+  font-size: calc(var(--s) * var(--fs-name));
+  line-height: 1.3;
+  margin-top: calc(var(--s) * var(--gap-title));
+}
+
+.pub .pub-authors {
+  font-size: calc(var(--s) * var(--fs-authors));
+  line-height: 1.3;
+  font-weight: 300;
+  font-style: italic;
+  margin-top: calc(var(--s) * var(--gap-authors));
+}
+/* your own name, underlined — as in the artboard */
+.pub .pub-authors .me { text-decoration: underline; text-underline-offset: calc(var(--s) * 2); }
+
+.pub .pub-links {
+  font-size: calc(var(--s) * var(--fs-links));
+  line-height: 1.3;
+  font-style: italic;
+  font-weight: 300;
+  margin-top: calc(var(--s) * var(--gap-links));
+}
+.pub .pub-links a {
+  color: inherit;
+  text-decoration: none;
+  margin-right: calc(var(--s) * 6);
+}
+.pub .pub-links a:hover,
+.pub .pub-links a:focus-visible { text-decoration: underline; }
+
+/* ── scroll hint ────────────────────────────────────────── */
+
+.hint {
+  position: absolute;
+  right: calc(var(--s) * 77.5);
+  bottom: calc(var(--s) * 14);
+  margin: 0;
+  font-size: calc(var(--s) * 14);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--pencil);
+  transition: opacity .5s ease;
+}
+.hint.is-gone { opacity: 0; }
+
+/* ── small screens: let the page behave like a page ─────── */
+
+@media (max-width: 760px), (max-height: 420px) {
+  html, body { overflow: auto; height: auto; }
+  body { display: block; }
+
+  :root { --s: calc(100vw / 420); }
+
+  .stage {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    padding: calc(var(--s) * 24) calc(var(--s) * 22) calc(var(--s) * 60);
+  }
+
+  .decor { position: fixed; inset: 0; opacity: .5; }
+  .roll--b { display: none; }
+  .sheet {
+    left: 6%; top: 10%;
+    width: calc(var(--s) * 300);
+    height: auto;
+  }
+
+  .kicker {
+    position: static;
+    width: auto;
+    text-align: left;
+    font-size: calc(var(--s) * 22);
+    line-height: 1.15;
+    margin-bottom: calc(var(--s) * 10);
+  }
+  .kicker span { display: inline; }
+  .kicker .amp { margin: 0 calc(var(--s) * 3); }
+
+  .pagetitle {
+    position: static;
+    font-size: calc(var(--s) * 54);
+    margin-bottom: calc(var(--s) * 26);
+  }
+
+  .port {
+    position: static;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scroll-snap-type: none;
+  }
+  .list { padding: 0; }
+  .pub { color: var(--ink); }
+  .pub-teaser {
+    position: static;
+    width: 62%;
+    height: auto;
+    aspect-ratio: 146.6 / 91.2;
+    margin: 0 0 calc(var(--s) * 10) 0;
+  }
+  .pub-teaser.is-empty { display: none; }
+  .pub-body {
+    margin-left: 0;
+    padding-left: 0;
+    padding-bottom: calc(var(--s) * 14);
+    margin-bottom: calc(var(--s) * 14);
+  }
+  .pub .pub-venue   { font-size: calc(var(--s) * 15); }
+  .pub .pub-title   { font-size: calc(var(--s) * 17); }
+  .pub .pub-authors { font-size: calc(var(--s) * 15); }
+  .pub .pub-links   { font-size: calc(var(--s) * 15); }
+  .hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pub, .hint { transition: none; }
+  .port { scroll-behavior: auto; }
+}

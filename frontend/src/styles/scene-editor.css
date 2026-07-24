@@ -31,10 +31,39 @@
   backdrop-filter: blur(6px);
 }
 
+/* Draggable header (grip + title + collapse) */
+.se-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -12px -14px 8px; /* pull to the panel edges so the whole bar is grabbable */
+  padding: 8px 12px;
+  cursor: move;
+  border-bottom: 1px solid #ececf0;
+  touch-action: none;
+  user-select: none;
+}
+.se-grip {
+  color: #b9b9c2;
+  font-size: 13px;
+  line-height: 1;
+}
 .se-title {
   font-weight: 700;
   font-size: 13px;
+  flex: 1;
 }
+.se-collapse {
+  border: none;
+  background: none;
+  color: #6b6b72;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.scene-editor.is-collapsed .se-body { display: none; }
+
 .se-hint {
   margin: 2px 0 10px;
   font-size: 11px;

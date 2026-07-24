@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ── the roll: sticky head, one continuous sheet, torn end ────── -->
+  <aside class="railcol" aria-hidden="true">
+    <div class="rail" id="rail"></div>
+    <div class="tail" id="tail"></div>
+    <div class="head">
+      <img src="assets/roll.png" alt="">
+      <canvas id="spin" width="520" height="416"></canvas>
+      <div class="kicker">Conference<br><span class="amp">&amp;</span><br>Journal</div>
+    </div>
+  </aside>
+
+  <!-- ── the list ─────────────────────────────────────────────────── -->
+  <main class="col">
+    <h1 class="pagetitle">Publications</h1>
+    <div class="meta" id="meta"></div>
+    <ol class="list" id="list"></ol>
+  </main>
+
+</div>
+
+<script src="js/publications.js" defer></script>
+<script src="js/roll.js" defer></script>
+</body>
+</html>

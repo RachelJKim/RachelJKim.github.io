@@ -154,6 +154,59 @@
 }
 .hcitechlab-link:hover::before { transform: scaleX(1); }
 
+/* ---------- CV: profile polaroid + "curriculum vitae" text (a link) ---------- */
+.hs-cv {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  container-type: inline-size;
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+}
+.hs-cv-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+  transition: transform 0.25s ease;
+}
+.hs-cv:hover .hs-cv-img { transform: translateY(-3px); }
+
+/* Text sits on the polaroid; a soft static underline hints it's a link, and a
+   black one sweeps in on hover (same treatment as .hcitechlab-link). */
+.hs-cv-text {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  font-family: var(--font-nav);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.1;
+  color: #3a3a3a;
+  white-space: nowrap;
+  border-bottom: 0.08em solid rgba(0, 0, 0, 0.28);
+  padding-bottom: 0.04em;
+  transition: border-color 0.25s ease;
+}
+.hs-cv-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.04em;
+  width: 100%;
+  height: 0.08em;
+  background-color: #111;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s ease;
+}
+.hs-cv:hover .hs-cv-text { border-bottom-color: transparent; }
+.hs-cv:hover .hs-cv-text::after { transform: scaleX(1); }
+
+.home-scene.editing .hs-cv { pointer-events: auto; }
+
 /* ---------- Trashbin doodle ---------- */
 .hs-trash {
   position: absolute;
@@ -164,9 +217,8 @@
   height: auto;
 }
 
-/* Nav-button objects the bin spits out on click. By default they hide *inside* the
-   bin (offset back to it, shrunk, spun); on .spat (click) or .editing they fly out
-   to their placements. --bin-dx/--bin-dy = offset from placement to the bin. */
+/* Nav-button objects (Publications / Projects / Misc) — always visible & clickable,
+   placed around the bin. */
 .hs-tobj {
   position: absolute;
   left: var(--x);
@@ -177,11 +229,8 @@
   background: none;
   line-height: 0;
   container-type: inline-size; /* so the label can size in cqw */
-  transform: translate(-50%, -50%) translate(var(--bin-dx), var(--bin-dy)) rotate(-140deg) scale(0.12);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.7s cubic-bezier(0.18, 0.7, 0.24, 1), opacity 0.25s ease;
-  will-change: transform, opacity;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  cursor: pointer;
 }
 .hs-tobj-img {
   display: block;
@@ -204,26 +253,6 @@
   white-space: nowrap;
   pointer-events: none;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.75), 0 1px 2px rgba(255, 255, 255, 0.6);
-}
-.home-scene.spat .hs-tobj,
-.home-scene.editing .hs-tobj {
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-  opacity: 1;
-}
-/* Clickable once spat; draggable (and no fly-in) in the editor. */
-.home-scene.spat .hs-tobj {
-  pointer-events: auto;
-  cursor: pointer;
-}
-.home-scene.editing .hs-tobj {
-  transition: none;
-  pointer-events: auto;
-}
-@media (prefers-reduced-motion: reduce) {
-  .hs-tobj {
-    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-    transition: opacity 0.2s ease;
-  }
 }
 
 /* ================= Responsive / mobile ================= */
@@ -248,12 +277,17 @@
   .hs-character,
   .hs-caption,
   .hs-notes,
+  .hs-cv,
   .hs-trash {
     position: relative;
     left: auto;
     top: auto;
     right: auto;
     margin: 0 auto;
+  }
+  .hs-cv {
+    transform: rotate(3deg);
+    width: min(48vw, 240px);
   }
   .hs-title {
     transform: none;
