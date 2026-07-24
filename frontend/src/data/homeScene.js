@@ -17,6 +17,11 @@ export const DEFAULT_LAYOUT = {
   // group's width) so it drags/scales with the paper.
   notesText: { leftCqw: 3,  topCqw: 15, widthCqw: 44, rot: -3 },
   trash:     { leftVw: 93,  topVh: 87,  widthVw: 5.5, rot: -3 },
+  // Objects the bin spits out when clicked; smaller than the bin. Their placements
+  // are where they land — tune them in /?edit.
+  objTissue: { leftVw: 84,  topVh: 80,  widthVw: 5,   rot: -10 },
+  objRock:   { leftVw: 88,  topVh: 93,  widthVw: 4,   rot: 8 },
+  objPet:    { leftVw: 96,  topVh: 84,  widthVw: 5,   rot: 14 },
 }
 
 // Human labels + which numeric fields each element exposes in the editor.
@@ -29,6 +34,9 @@ export const FIELDS = {
   notes:     ['leftVw', 'topVh', 'widthVw', 'rot'],
   notesText: ['leftCqw', 'topCqw', 'widthCqw', 'rot'],
   trash:     ['leftVw', 'topVh', 'widthVw', 'rot'],
+  objTissue: ['leftVw', 'topVh', 'widthVw', 'rot'],
+  objRock:   ['leftVw', 'topVh', 'widthVw', 'rot'],
+  objPet:    ['leftVw', 'topVh', 'widthVw', 'rot'],
 }
 
 const KEY = 'homeSceneLayout'

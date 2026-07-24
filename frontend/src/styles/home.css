@@ -36,12 +36,47 @@
   transform: translate(-50%, -50%);
   width: var(--w);
   container-type: inline-size;
+  cursor: pointer; /* reads as clickable (not wired yet) */
+  /* back-out easing overshoots then settles: "bigger, then back a bit" */
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Hover pop (not in the editor, where the character is being dragged). */
+.home-scene:not(.editing) .hs-character:hover {
+  transform: translate(-50%, -50%) scale(1.06);
 }
 
 .hs-frame {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* "coming soon" note that pops above the character on hover. */
+.hs-coming-soon {
+  position: absolute;
+  left: 50%;
+  bottom: 103%;
+  transform: translate(-50%, 8px);
+  font-family: var(--font-nav);
+  font-size: 11cqw;
+  line-height: 1;
+  color: #141414;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.home-scene:not(.editing) .hs-character:hover .hs-coming-soon {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-character { transition: none; }
+  .home-scene:not(.editing) .hs-character:hover {
+    transform: translate(-50%, -50%); /* no scale */
+  }
+  .hs-coming-soon { transition: opacity 0.2s ease; }
 }
 
 /* Eyes are positioned inline (in cqw) from data/homeScene.js so they scale with
@@ -129,6 +164,39 @@
   height: auto;
 }
 
+/* Objects the bin spits out on click. By default they hide *inside* the bin
+   (offset back to it, shrunk, spun); on .spat (click) or .editing they fly out to
+   their placements. --bin-dx/--bin-dy = offset from placement to the bin. */
+.hs-tobj {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: auto;
+  transform: translate(-50%, -50%) translate(var(--bin-dx), var(--bin-dy)) rotate(-140deg) scale(0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.18, 0.7, 0.24, 1), opacity 0.25s ease;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+.home-scene.spat .hs-tobj,
+.home-scene.editing .hs-tobj {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  opacity: 1;
+}
+/* In the editor: no fly-in, and make them draggable. */
+.home-scene.editing .hs-tobj {
+  transition: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-tobj {
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    transition: opacity 0.2s ease;
+  }
+}
+
 /* ================= Responsive / mobile ================= */
 /* Portrait or narrow screens: the fixed landscape composition would collide, so
    stack the groups vertically down a scrollable column instead. */
@@ -145,6 +213,8 @@
     gap: 4vh;
     padding: 9vh 6vw 12vh;
   }
+  /* The spit-out objects are a desktop flourish; skip them in the stacked layout. */
+  .hs-tobj { display: none; }
   .hs-title,
   .hs-character,
   .hs-caption,

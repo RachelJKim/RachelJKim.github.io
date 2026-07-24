@@ -6,6 +6,13 @@ import TrashBin from '../components/TrashBin'
 import { loadLayout, saveLayout, DEFAULT_LAYOUT } from '../data/homeScene'
 import '../styles/home.css'
 
+// Objects the trash bin spits out on click (layout key → artwork).
+const TRASH_OBJECTS = [
+  { key: 'objTissue', src: '/images/trashbin/nav-tissue.png' },
+  { key: 'objRock', src: '/images/trashbin/nav-rock.png' },
+  { key: 'objPet', src: '/images/trashbin/nav-pet.png' },
+]
+
 /* Home — a single full-screen "desk" scene from Rachel's wireframe. Element
    positions/sizes come from data/homeScene.js so they can be tuned live at
    /?edit (drag + the SceneEditor panel). Positions are fed to CSS as custom
@@ -17,6 +24,7 @@ export default function Home() {
 
   const [layout, setLayout] = useState(loadLayout)
   const [selected, setSelected] = useState('character')
+  const [spat, setSpat] = useState(false) // has the bin spat its objects out?
   const characterRef = useRef(null)
   const notesRef = useRef(null)
   const dragRef = useRef(null)
@@ -32,9 +40,6 @@ export default function Home() {
 
   const round = (n) => Math.round(n * 10) / 10
   const update = (key, patch) => setLayout((L) => ({ ...L, [key]: { ...L[key], ...patch } }))
-
-  // Trash-bin is a nav button; destination TBD (see message to Rachel).
-  const handleTrashNav = () => {}
 
   // Drag-to-move in edit mode. Top-level groups move in vw/vh against the viewport;
   // elements inside another (eyes, notes text) move in cqw against their parent's
@@ -92,7 +97,7 @@ export default function Home() {
   const tr = layout.trash
 
   return (
-    <div className={`home-scene${editMode ? ' editing' : ''}`}>
+    <div className={`home-scene${editMode ? ' editing' : ''}${spat ? ' spat' : ''}`}>
       {/* Title */}
       <h1
         className={`hs-title${sel('title')}`}
@@ -123,6 +128,9 @@ export default function Home() {
           style={{ left: `${eR.leftCqw}cqw`, top: `${eR.topCqw}cqw`, transform: `rotate(${eR.rot || 0}deg)` }}
           {...dragProps('eyeR')}
         />
+
+        {/* Hover affordance — not clickable yet */}
+        <span className="hs-coming-soon" aria-hidden="true">coming soon</span>
       </div>
 
       {/* Caption — its own element so the gap to the character is adjustable */}
@@ -167,14 +175,39 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trashbin — animated nav button (lid opens + bits pop out on hover) */}
+      {/* Trashbin — lid opens on hover; a click spits the objects out */}
       <TrashBin
         className={`hs-trash${sel('trash')}`}
         style={{ '--x': `${tr.leftVw}vw`, '--y': `${tr.topVh}vh`, '--w': `${tr.widthVw}vw`, '--rot': `${tr.rot || 0}deg` }}
         label="Trash"
-        onClick={editMode ? undefined : handleTrashNav}
+        onClick={editMode ? undefined : () => setSpat((s) => !s)}
         {...dragProps('trash')}
       />
+
+      {/* Objects the bin spits out (hidden in the bin until a click; shown in edit
+          mode so their landing spots can be placed). They fly out from the bin. */}
+      {TRASH_OBJECTS.map((o, i) => {
+        const obj = layout[o.key]
+        return (
+          <img
+            key={o.key}
+            className={`hs-tobj${sel(o.key)}`}
+            src={o.src}
+            alt=""
+            draggable="false"
+            style={{
+              '--x': `${obj.leftVw}vw`,
+              '--y': `${obj.topVh}vh`,
+              '--w': `${obj.widthVw}vw`,
+              '--rot': `${obj.rot || 0}deg`,
+              '--bin-dx': `${(tr.leftVw - obj.leftVw).toFixed(1)}vw`,
+              '--bin-dy': `${(tr.topVh - obj.topVh).toFixed(1)}vh`,
+              transitionDelay: `${(i * 0.06).toFixed(2)}s`,
+            }}
+            {...dragProps(o.key)}
+          />
+        )
+      })}
 
       {editMode && (
         <SceneEditor

@@ -54,7 +54,8 @@
 }
 
 /* Hover / keyboard focus: the lid swings open, holds, then shuts — looping with a
-   short beat closed. Kept in sync with the items popping out (below). */
+   short beat closed. Opening animation only; the bin spits objects on click, not
+   hover (those live in the scene, see .hs-tobj in home.css). */
 .trashbin:hover .trashbin-lid,
 .trashbin:focus-visible .trashbin-lid {
   animation: tb-lid-open 1.8s ease-in-out infinite;
@@ -65,39 +66,6 @@
   30%, 50%  { transform: translateY(-8%) rotate(27deg); }  /* held open */
   68%       { transform: translateY(0)   rotate(0deg); }   /* shut */
   100%      { transform: translateY(0)   rotate(0deg); }   /* beat closed */
-}
-
-/* Bits that pop out of the bin while it's open. A zero-size anchor at the bin
-   mouth; each item is centred on it, then flung up/out by tb-pop. */
-.tb-items {
-  position: absolute;
-  top: 26%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-.tb-item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  font-size: 30cqw;
-  line-height: 1;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.3);
-  will-change: transform, opacity;
-}
-.trashbin:hover .tb-item,
-.trashbin:focus-visible .tb-item {
-  animation: tb-pop 1.8s ease-out infinite;
-  /* per-item animation-delay comes from the inline style (stagger) */
-}
-@keyframes tb-pop {
-  0%, 10% { opacity: 0; transform: translate(-50%, -50%) translate(0, 25%) scale(0.3) rotate(0deg); }
-  26%     { opacity: 1; transform: translate(-50%, -50%) translate(calc(var(--dx) * 0.5), -120%) scale(1) rotate(calc(var(--r) * 0.6)); }
-  42%     { opacity: 1; transform: translate(-50%, -50%) translate(var(--dx), -175%) scale(1) rotate(var(--r)); }
-  58%     { opacity: 0; transform: translate(-50%, -50%) translate(calc(var(--dx) * 1.15), -110%) scale(0.75) rotate(calc(var(--r) * 1.2)); }
-  100%    { opacity: 0; transform: translate(-50%, -50%) translate(0, 25%) scale(0.3) rotate(0deg); }
 }
 
 /* Press: lid flips open, as if to catch what you're tossing. */
