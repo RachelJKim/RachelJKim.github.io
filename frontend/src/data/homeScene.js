@@ -7,21 +7,20 @@
 // "Copy JSON" and paste the object below to make it the committed default.
 
 export const DEFAULT_LAYOUT = {
-  title:     { leftVw: 7,   topVh: 8,   fontVw: 8.5 },
-  character: { leftVw: 18,  topVh: 57,  widthVw: 20 },
-  eyeL:      { leftCqw: 2,  topCqw: 16, sizeCqw: 49, rot: 0 },
-  eyeR:      { leftCqw: 51, topCqw: 14, sizeCqw: 47, rot: 4 },
-  caption:   { leftVw: 18,  topVh: 84,  fontVw: 1.7 },
-  notes:     { leftVw: 70,  topVh: 50,  widthVw: 50, rot: 0 },
+  title:     { leftVw: 6.9,  topVh: 10.8, fontVw: 8.5 },
+  character: { leftVw: 23.7, topVh: 61,   widthVw: 18.5 },
+  eyeL:      { leftCqw: -1.8, topCqw: 18.3, sizeCqw: 51,   rot: 0 },
+  eyeR:      { leftCqw: 53.9, topCqw: 8.6,  sizeCqw: 50.5, rot: 4 },
+  caption:   { leftVw: 23.8, topVh: 92.5, fontVw: 1.7 },
+  notes:     { leftVw: 73.5, topVh: 45.3, widthVw: 50, rot: 1 },
   // The intro text overlaid on the notes paper. Positioned in cqw (% of the notes
   // group's width) so it drags/scales with the paper.
-  notesText: { leftCqw: 3,  topCqw: 15, widthCqw: 44, rot: -3 },
-  trash:     { leftVw: 93,  topVh: 87,  widthVw: 5.5, rot: -3 },
-  // Objects the bin spits out when clicked; smaller than the bin. Their placements
-  // are where they land — tune them in /?edit.
-  objTissue: { leftVw: 84,  topVh: 80,  widthVw: 5,   rot: -10 },
-  objRock:   { leftVw: 88,  topVh: 93,  widthVw: 4,   rot: 8 },
-  objPet:    { leftVw: 96,  topVh: 84,  widthVw: 5,   rot: 14 },
+  notesText: { leftCqw: 8.5, topCqw: 22.9, widthCqw: 59, rot: -1.5 },
+  trash:     { leftVw: 91.9, topVh: 86.8, widthVw: 6.5, rot: -3 },
+  // Objects the bin spits out when clicked. Their placements are where they land.
+  objTissue: { leftVw: 51.5, topVh: 77.1, widthVw: 10,  rot: -10 },
+  objRock:   { leftVw: 83.4, topVh: 73.6, widthVw: 7.5, rot: 8 },
+  objPet:    { leftVw: 51.5, topVh: 24.8, widthVw: 10,  rot: -3 },
 }
 
 // Human labels + which numeric fields each element exposes in the editor.
