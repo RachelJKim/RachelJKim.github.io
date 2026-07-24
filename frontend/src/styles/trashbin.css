@@ -60,11 +60,11 @@
   animation: tb-lid-open 1.8s ease-in-out infinite;
 }
 @keyframes tb-lid-open {
-  0%        { transform: translateY(0)   rotate(0deg); }    /* closed */
-  12%       { transform: translateY(-6%) rotate(-18deg); }  /* swinging open */
-  30%, 50%  { transform: translateY(-8%) rotate(-27deg); }  /* held open */
-  68%       { transform: translateY(0)   rotate(0deg); }    /* shut */
-  100%      { transform: translateY(0)   rotate(0deg); }    /* beat closed */
+  0%        { transform: translateY(0)   rotate(0deg); }   /* closed */
+  12%       { transform: translateY(-6%) rotate(18deg); }  /* swinging open */
+  30%, 50%  { transform: translateY(-8%) rotate(27deg); }  /* held open */
+  68%       { transform: translateY(0)   rotate(0deg); }   /* shut */
+  100%      { transform: translateY(0)   rotate(0deg); }   /* beat closed */
 }
 
 /* Bits that pop out of the bin while it's open. A zero-size anchor at the bin
@@ -103,7 +103,7 @@
 /* Press: lid flips open, as if to catch what you're tossing. */
 .trashbin:active .trashbin-lid {
   animation: none;
-  transform: translateY(-9%) rotate(-11deg);
+  transform: translateY(-9%) rotate(11deg);
   transition: transform 0.12s ease-out;
 }
 
@@ -124,10 +124,10 @@
   .trashbin:hover .trashbin-lid,
   .trashbin:focus-visible .trashbin-lid {
     animation: none;
-    transform: translateY(-8%) rotate(-16deg); /* just hold the lid open */
+    transform: translateY(-8%) rotate(16deg); /* just hold the lid open */
   }
   .trashbin:active .trashbin-lid {
-    transform: translateY(-8%) rotate(-10deg);
+    transform: translateY(-8%) rotate(10deg);
   }
   /* No flying bits under reduced motion. */
   .trashbin:hover .tb-item,
