@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
 import SceneEditor from '../components/SceneEditor'
 import TrashBin from '../components/TrashBin'
 import { loadLayout, saveLayout, DEFAULT_LAYOUT } from '../data/homeScene'
 import '../styles/home.css'
 
-// Objects the trash bin spits out on click (layout key → artwork).
+// Objects the trash bin spits out on click — each is a nav button (artwork +
+// label → route).
 const TRASH_OBJECTS = [
-  { key: 'objTissue', src: '/images/trashbin/nav-tissue.png' },
-  { key: 'objRock', src: '/images/trashbin/nav-rock.png' },
-  { key: 'objPet', src: '/images/trashbin/nav-pet.png' },
+  { key: 'objTissue', src: '/images/trashbin/nav-tissue.png', label: 'Publications', to: '/publications' },
+  { key: 'objPet', src: '/images/trashbin/nav-pet.png', label: 'Projects', to: '/projects' },
+  { key: 'objRock', src: '/images/trashbin/nav-rock.png', label: 'Misc', to: '/misc' },
 ]
 
 /* Home — a single full-screen "desk" scene from Rachel's wireframe. Element
@@ -20,6 +21,7 @@ const TRASH_OBJECTS = [
    override them; the eyes and caption sit inside the character and use cqw. */
 export default function Home() {
   const { search } = useLocation()
+  const navigate = useNavigate()
   const editMode = new URLSearchParams(search).has('edit')
 
   const [layout, setLayout] = useState(loadLayout)
@@ -184,17 +186,17 @@ export default function Home() {
         {...dragProps('trash')}
       />
 
-      {/* Objects the bin spits out (hidden in the bin until a click; shown in edit
-          mode so their landing spots can be placed). They fly out from the bin. */}
+      {/* Objects the bin spits out — nav buttons. Hidden in the bin until a click;
+          shown (and draggable) in edit mode so their landing spots can be placed. */}
       {TRASH_OBJECTS.map((o, i) => {
         const obj = layout[o.key]
         return (
-          <img
+          <button
             key={o.key}
+            type="button"
             className={`hs-tobj${sel(o.key)}`}
-            src={o.src}
-            alt=""
-            draggable="false"
+            aria-label={o.label}
+            onClick={editMode ? undefined : () => navigate(o.to)}
             style={{
               '--x': `${obj.leftVw}vw`,
               '--y': `${obj.topVh}vh`,
@@ -205,7 +207,10 @@ export default function Home() {
               transitionDelay: `${(i * 0.06).toFixed(2)}s`,
             }}
             {...dragProps(o.key)}
-          />
+          >
+            <img className="hs-tobj-img" src={o.src} alt="" draggable="false" />
+            <span className="hs-tobj-label">{o.label}</span>
+          </button>
         )
       })}
 

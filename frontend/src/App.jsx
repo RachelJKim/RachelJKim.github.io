@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Publications from './pages/Publications'
 import Projects from './pages/Projects'
 import About from './pages/About'
+import Misc from './pages/Misc'
 
 export default function App() {
   const location = useLocation()
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/publications" element={<Publications />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
+          <Route path="/misc" element={<Misc />} />
         </Routes>
       </main>
     </>

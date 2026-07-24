@@ -164,28 +164,57 @@
   height: auto;
 }
 
-/* Objects the bin spits out on click. By default they hide *inside* the bin
-   (offset back to it, shrunk, spun); on .spat (click) or .editing they fly out to
-   their placements. --bin-dx/--bin-dy = offset from placement to the bin. */
+/* Nav-button objects the bin spits out on click. By default they hide *inside* the
+   bin (offset back to it, shrunk, spun); on .spat (click) or .editing they fly out
+   to their placements. --bin-dx/--bin-dy = offset from placement to the bin. */
 .hs-tobj {
   position: absolute;
   left: var(--x);
   top: var(--y);
   width: var(--w);
-  height: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  container-type: inline-size; /* so the label can size in cqw */
   transform: translate(-50%, -50%) translate(var(--bin-dx), var(--bin-dy)) rotate(-140deg) scale(0.12);
   opacity: 0;
   pointer-events: none;
   transition: transform 0.7s cubic-bezier(0.18, 0.7, 0.24, 1), opacity 0.25s ease;
   will-change: transform, opacity;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+.hs-tobj-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.22));
+}
+/* Label sits directly on the object (no background), bold TT Moons, tilted with
+   the object; a soft white halo keeps it readable over any object. */
+.hs-tobj-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-nav);
+  font-weight: 700;
+  font-size: 17cqw;
+  line-height: 1;
+  color: #111;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.75), 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 .home-scene.spat .hs-tobj,
 .home-scene.editing .hs-tobj {
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   opacity: 1;
 }
-/* In the editor: no fly-in, and make them draggable. */
+/* Clickable once spat; draggable (and no fly-in) in the editor. */
+.home-scene.spat .hs-tobj {
+  pointer-events: auto;
+  cursor: pointer;
+}
 .home-scene.editing .hs-tobj {
   transition: none;
   pointer-events: auto;
