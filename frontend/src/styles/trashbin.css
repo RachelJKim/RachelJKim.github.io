@@ -75,11 +75,10 @@
   transition: transform 0.12s ease-out;
 }
 
-/* Keyboard focus ring on the button itself (lid stays pointer-events:none). */
+/* No focus box (Rachel's call) — the lid-open + the lift (in home.css) are the
+   clickable affordance instead. */
 .trashbin:focus-visible {
-  outline: 3px solid #2b4de0;
-  outline-offset: 4px;
-  border-radius: 8px;
+  outline: none;
 }
 
 /* Accessibility: no looping motion, but keep a static lift so it still reads

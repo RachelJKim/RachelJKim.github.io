@@ -1,129 +1,75 @@
-/* PUBLICATIONS LAYOUT - scoped so main body stays default unless on this page */
-body.publications-page {
-  background-color: rgb(255, 255, 249);
+/* Publications = the toilet-paper scroll page (public/publications-page/), embedded
+   full-screen in an iframe so its own html/body CSS + canvas JS stay isolated. */
+.pub-frame-wrap {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 1;
+}
+.pub-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
-.publication-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Text nav overlaid on the full-screen pages, top-right (pulled in from the edge). */
+.pub-nav {
+  position: fixed;
+  top: 27px;
+  right: 52px;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
 }
+.pub-nav button {
+  border: none;
+  background: none;
+  padding: 2px 0;
+  color: #8a8a8a;
+  font-family: 'TT Moons', Georgia, serif;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.pub-nav button:hover,
+.pub-nav button:focus-visible {
+  color: #000;
+  transform: translateY(-1px);
+  outline: none;
+}
+.pub-nav .pub-nav-home { color: #555; }
 
-.publication-page-title {
-  font-size: 2.5rem;
-  font-weight: 600;
-  margin-bottom: 3rem;
+/* Blank white "coming soon" pages (Projects, Misc) — same full-screen white
+   treatment as Publications, with the shared nav. */
+.coming-soon {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+}
+.coming-soon-body {
   text-align: center;
-  text-decoration: underline;
+  padding: 0 6vw;
 }
-
-.publication-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+.coming-soon-title {
+  margin: 0;
+  font-family: 'TT Moons', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(48px, 9vw, 132px);
+  letter-spacing: -0.012em;
+  line-height: 0.92;
+  color: #111;
 }
-
-.publication-media {
-  flex-shrink: 0;
-}
-
-.publication-img {
-  width: 250px;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.publication-details {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.publication-info {
-  font-size: 0.9rem;
-  font-weight: 450;
-  margin-bottom: 0.5rem;
-}
-
-.publication-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.publication-authors {
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.publication-links {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.publication-link {
-  font-size: 0.9rem;
-  color: #0073e6;
-  text-decoration: none;
-}
-
-.publication-link:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 800px) {
-  .publication-page-title {
-    font-size: 2rem;
-  }
-
-  .publication-img {
-    width: 200px;
-    height: 120px;
-  }
-
-  .publication-info {
-    font-size: 0.7rem;
-  }
-
-  .publication-title {
-    font-size: 1rem;
-  }
-
-  .publication-authors {
-    font-size: 0.7rem;
-  }
-
-  .publication-link {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .publication-page-title {
-    font-size: 1.6rem;
-  }
-
-  .publication-item {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .publication-info {
-    font-size: 0.7rem;
-  }
-
-  .publication-title {
-    font-size: 1rem;
-  }
-
-  .publication-authors {
-    font-size: 0.8rem;
-  }
-
-  .publication-link {
-    font-size: 0.6rem;
-  }
+.coming-soon-sub {
+  margin: 0.7em 0 0;
+  font-family: 'TT Moons', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(16px, 2.2vw, 26px);
+  color: #9a9a9a;
 }

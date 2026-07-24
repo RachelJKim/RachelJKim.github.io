@@ -14,7 +14,7 @@ const TRASH_OBJECTS = [
   { key: 'objRock', src: '/images/trashbin/nav-rock.png', label: 'Misc', to: '/misc' },
 ]
 
-const CV_URL = 'https://docs.google.com/document/d/1gHNZp9hdkjh8tue9ZRP-6wNHoDDXblbBZcAo8HiCfN8/edit?usp=sharing'
+const CV_URL = 'https://drive.google.com/file/d/1Jgra7dpJOcXx_XTupPSd6WcpMObqTLVS/view?usp=drive_link'
 
 /* Home — a single full-screen "desk" scene from Rachel's wireframe. Element
    positions/sizes come from data/homeScene.js so they can be tuned live at
@@ -28,6 +28,7 @@ export default function Home() {
 
   const [layout, setLayout] = useState(loadLayout)
   const [selected, setSelected] = useState('character')
+  const [spat, setSpat] = useState(false) // have the nav objects been spat out of the bin?
   const characterRef = useRef(null)
   const notesRef = useRef(null)
   const cvRef = useRef(null)
@@ -35,7 +36,7 @@ export default function Home() {
 
   // Elements positioned in cqw *inside* another element drag relative to that
   // parent's width (rather than in vw/vh against the viewport).
-  const REL_PARENT = { eyeL: characterRef, eyeR: characterRef, notesText: notesRef, cvText: cvRef }
+  const REL_PARENT = { eyeL: characterRef, eyeR: characterRef, notesText: notesRef, contactText: notesRef, cvText: cvRef }
 
   useEffect(() => {
     document.body.classList.add('home-scene-body')
@@ -98,12 +99,13 @@ export default function Home() {
   const cap = layout.caption
   const n = layout.notes
   const nt = layout.notesText
+  const ct = layout.contactText
   const cvg = layout.cv
   const cvt = layout.cvText
   const tr = layout.trash
 
   return (
-    <div className={`home-scene${editMode ? ' editing' : ''}`}>
+    <div className={`home-scene${editMode ? ' editing' : ''}${spat ? ' spat' : ''}`}>
       {/* Title */}
       <h1
         className={`hs-title${sel('title')}`}
@@ -178,6 +180,24 @@ export default function Home() {
             title="HCITech Lab"
           />
         </div>
+
+        {/* Contact line below the intro — LinkedIn/GitHub/Scholar/X hover links */}
+        <div
+          className={`hs-contact${sel('contactText')}`}
+          style={{ left: `${ct.leftCqw}cqw`, top: `${ct.topCqw}cqw`, width: `${ct.widthCqw}cqw`, transform: `rotate(${ct.rot || 0}deg)` }}
+          {...dragProps('contactText')}
+        >
+          <img
+            className="hs-contact-img"
+            src="/images/home/text-contact.png"
+            alt="You can email luxo@racheljk.me, or come check out my LinkedIn, GitHub, Google Scholar, or X."
+            draggable="false"
+          />
+          <a className="contact-link link-linkedin" href="https://www.linkedin.com/in/rachel-kim-925366323/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn" />
+          <a className="contact-link link-github" href="https://github.com/RachelJKim" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub" />
+          <a className="contact-link link-scholar" href="https://scholar.google.com/citations?user=MHj2MAoAAAAJ" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar" title="Google Scholar" />
+          <a className="contact-link link-x" href="https://x.com/Rachel_JKim" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X" />
+        </div>
       </div>
 
       {/* CV: the profile polaroid + "curriculum vitae" text, together a link to the
@@ -203,16 +223,19 @@ export default function Home() {
         </span>
       </a>
 
-      {/* Trashbin — decorative; the nav objects sit around it. Lid opens on hover. */}
+      {/* Trashbin — click to spit the nav objects out (and click again to pull them
+          back in). Lid opens on hover. */}
       <TrashBin
         className={`hs-trash${sel('trash')}`}
         style={{ '--x': `${tr.leftVw}vw`, '--y': `${tr.topVh}vh`, '--w': `${tr.widthVw}vw`, '--rot': `${tr.rot || 0}deg` }}
         label="Trash"
+        onClick={editMode ? undefined : () => setSpat((s) => !s)}
         {...dragProps('trash')}
       />
 
-      {/* Nav objects — always visible, clickable buttons (draggable in edit mode). */}
-      {TRASH_OBJECTS.map((o) => {
+      {/* Nav objects — hidden in the bin; a click spits them out (and back). Shown
+          statically for placement in edit mode. */}
+      {TRASH_OBJECTS.map((o, i) => {
         const obj = layout[o.key]
         return (
           <button
@@ -226,6 +249,9 @@ export default function Home() {
               '--y': `${obj.topVh}vh`,
               '--w': `${obj.widthVw}vw`,
               '--rot': `${obj.rot || 0}deg`,
+              '--bin-dx': `${(tr.leftVw - obj.leftVw).toFixed(1)}vw`,
+              '--bin-dy': `${(tr.topVh - obj.topVh).toFixed(1)}vh`,
+              transitionDelay: `${(i * 0.08).toFixed(2)}s`,
             }}
             {...dragProps(o.key)}
           >

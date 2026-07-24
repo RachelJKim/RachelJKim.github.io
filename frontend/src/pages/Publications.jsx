@@ -1,6 +1,12 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import '../styles/publications.css'
+import SiteNav from '../components/SiteNav'
 
+/* Publications — the "toilet-paper scroll" page. It's a self-contained static page
+   (its own html/body CSS + canvas scroll animation) copied verbatim to
+   public/publications-page/, and embedded full-screen in an iframe here so its
+   global styles and scripts stay isolated from the React app. Edit the paper list
+   in public/publications-page/js/publications.js. */
 export default function Publications() {
   useEffect(() => {
     document.body.classList.add('publications-page')
@@ -8,95 +14,9 @@ export default function Publications() {
   }, [])
 
   return (
-    <section id="publications">
-      <div className="publication-container">
-        <h3 className="publication-page-title">Publications</h3>
-        <div className="publication-list">
-          {/* [IMWUT'23] HapticPilot */}
-          <div id="hapticpilot" className="publication-item">
-            <div className="publication-media">
-              <img
-                className="publication-img"
-                src="/images/publications/hapticpilot.png"
-                alt="Teaser Image"
-              />
-            </div>
-            <div className="publication-details">
-              <p className="publication-info">[IMWUT'23]</p>
-              <h3 className="publication-title">
-                HapticPilot: Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality
-              </h3>
-              <p className="publication-authors">
-                Youjin Sung, <strong>Rachel Kim</strong>, Kun Woo Song, Yitian Shao, Sang Ho Yoon
-              </p>
-              <div className="publication-links">
-                <a
-                  href="https://drive.google.com/file/d/1o_eSmWT46Qvo9EH3GD-jc355G4TtQZeS/view?usp=sharing"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="publication-link"
-                >
-                  PDF
-                </a>
-                <a
-                  href="https://dl.acm.org/doi/abs/10.1145/3631453"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="publication-link"
-                >
-                  DOI
-                </a>
-                <a
-                  href="https://youtu.be/PJk7SUa8ZpI?si=xpLjlQfuJPNW3a3E"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="publication-link"
-                >
-                  VIDEO
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* [VRST'22 Poster] */}
-          <div id="vrst22-poster" className="publication-item">
-            <div className="publication-media">
-              <img
-                className="publication-img"
-                src="/images/publications/vrst22-poster.png"
-                alt="Teaser Image"
-              />
-            </div>
-            <div className="publication-details">
-              <p className="publication-info">[VRST'22 Poster]</p>
-              <h3 className="publication-title">
-                Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR
-              </h3>
-              <p className="publication-authors">
-                Youjin Sung, Yitian Shao, <strong>Rachel Kim</strong>, Sang Ho Yoon
-              </p>
-              <div className="publication-links">
-                <a
-                  href="https://drive.google.com/file/d/1t8wBANStvBEIRH4kaNDKAUPuB1rKPL-F/view?usp=sharing"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="publication-link"
-                >
-                  PDF
-                </a>
-                <a
-                  href="https://dl.acm.org/doi/abs/10.1145/3631453"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="publication-link"
-                >
-                  DOI
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div className="pub-frame-wrap">
+      <iframe className="pub-frame" src="/publications-page/index.html" title="Publications — Rachel Kim" />
+      <SiteNav />
+    </div>
   )
 }

@@ -8,8 +8,13 @@ import Misc from './pages/Misc'
 
 export default function App() {
   const location = useLocation()
-  // Home and About are full-bleed: no fixed navbar, so no top offset to compensate for.
-  const isFlush = location.pathname === '/' || location.pathname === '/about'
+  // All routes are full-bleed pages with their own nav: no fixed navbar, no top offset.
+  const isFlush =
+    location.pathname === '/' ||
+    location.pathname === '/about' ||
+    location.pathname === '/publications' ||
+    location.pathname === '/projects' ||
+    location.pathname === '/misc'
 
   return (
     <>

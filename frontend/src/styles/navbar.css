@@ -159,7 +159,8 @@ a:hover {
 }
 
 .navbar-wrapper.home-page,
-.navbar-wrapper.about-page {
+.navbar-wrapper.about-page,
+.navbar-wrapper.publications-page {
   display: none;
 }
 

@@ -148,11 +148,58 @@
   transform-origin: left center;
   transition: transform 0.35s ease;
 }
-.hcitechlab-link:hover {
+.hcitechlab-link:hover,
+.hcitechlab-link:focus-visible {
   border-bottom-color: transparent; /* hand off to the animated underline */
   transform: translateY(-2px);
+  outline: none;
 }
-.hcitechlab-link:hover::before { transform: scaleX(1); }
+.hcitechlab-link:hover::before,
+.hcitechlab-link:focus-visible::before { transform: scaleX(1); }
+
+/* ---------- Contact line (below the intro): LinkedIn/GitHub/Scholar/X links ----
+   Same underline-sweep as .hcitechlab-link; hotspots placed over each word.
+   (ideas/about-text/contact-text.html.) */
+.hs-contact {
+  position: absolute;
+  transform-origin: left top;
+}
+.hs-contact-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.contact-link {
+  position: absolute;
+  cursor: pointer;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.28);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.contact-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s ease;
+}
+.contact-link:hover,
+.contact-link:focus-visible {
+  border-bottom-color: transparent;
+  transform: translateY(-2px);
+  outline: none;
+}
+.contact-link:hover::before,
+.contact-link:focus-visible::before { transform: scaleX(1); }
+/* Position each hotspot over its word on the second line. */
+.link-linkedin { top: 56%; left: -1%;   width: 13%;  height: 40%; }
+.link-github   { top: 56%; left: 14.5%; width: 10%;  height: 40%; }
+.link-scholar  { top: 56%; left: 27%;   width: 22%;  height: 40%; }
+.link-x        { top: 56%; left: 50.5%; width: 4.5%; height: 40%; }
 
 /* ---------- CV: profile polaroid + "curriculum vitae" text (a link) ---------- */
 .hs-cv {
@@ -166,6 +213,7 @@
   cursor: pointer;
   text-decoration: none;
 }
+.hs-cv:focus-visible { outline: none; }
 .hs-cv-img {
   display: block;
   width: 100%;
@@ -173,7 +221,8 @@
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
   transition: transform 0.25s ease;
 }
-.hs-cv:hover .hs-cv-img { transform: translateY(-3px); }
+.hs-cv:hover .hs-cv-img,
+.hs-cv:focus-visible .hs-cv-img { transform: translateY(-3px); }
 
 /* Text sits on the polaroid; a soft static underline hints it's a link, and a
    black one sweeps in on hover (same treatment as .hcitechlab-link). */
@@ -202,8 +251,10 @@
   transform-origin: left center;
   transition: transform 0.35s ease;
 }
-.hs-cv:hover .hs-cv-text { border-bottom-color: transparent; }
-.hs-cv:hover .hs-cv-text::after { transform: scaleX(1); }
+.hs-cv:hover .hs-cv-text,
+.hs-cv:focus-visible .hs-cv-text { border-bottom-color: transparent; }
+.hs-cv:hover .hs-cv-text::after,
+.hs-cv:focus-visible .hs-cv-text::after { transform: scaleX(1); }
 
 .home-scene.editing .hs-cv { pointer-events: auto; }
 
@@ -215,10 +266,18 @@
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   width: var(--w);
   height: auto;
+  transition: transform 0.2s ease;
+}
+/* Same clickable lift as the nav objects / CV (on top of the lid-open animation). */
+.home-scene:not(.editing) .hs-trash:hover,
+.home-scene:not(.editing) .hs-trash:focus-visible {
+  transform: translate(-50%, -50%) translateY(-3px) rotate(var(--rot, 0deg));
 }
 
-/* Nav-button objects (Publications / Projects / Misc) — always visible & clickable,
-   placed around the bin. */
+/* Nav-button objects (Publications / Projects / Misc). They start hidden *inside*
+   the bin, then fly out to their placements once `.spat` is added on load (the
+   entrance animation). In `.editing` they're shown statically for placement.
+   --bin-dx/--bin-dy = offset from placement back to the bin. */
 .hs-tobj {
   position: absolute;
   left: var(--x);
@@ -229,14 +288,18 @@
   background: none;
   line-height: 0;
   container-type: inline-size; /* so the label can size in cqw */
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-  cursor: pointer;
+  transform: translate(-50%, -50%) translate(var(--bin-dx), var(--bin-dy)) rotate(-140deg) scale(0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.18, 0.7, 0.24, 1), opacity 0.25s ease;
+  will-change: transform, opacity;
 }
 .hs-tobj-img {
   display: block;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.22));
+  transition: transform 0.2s ease;
 }
 /* Label sits directly on the object (no background), bold TT Moons, tilted with
    the object; a soft white halo keeps it readable over any object. */
@@ -253,6 +316,38 @@
   white-space: nowrap;
   pointer-events: none;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.75), 0 1px 2px rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s ease;
+}
+/* Clickable affordance: lift on hover / keyboard focus (same as the CV polaroid).
+   No focus box — the lift is the indicator. */
+.hs-tobj:focus-visible { outline: none; }
+.home-scene:not(.editing) .hs-tobj:hover .hs-tobj-img,
+.home-scene:not(.editing) .hs-tobj:focus-visible .hs-tobj-img {
+  transform: translateY(-3px);
+}
+.home-scene:not(.editing) .hs-tobj:hover .hs-tobj-label,
+.home-scene:not(.editing) .hs-tobj:focus-visible .hs-tobj-label {
+  transform: translate(-50%, -50%) translateY(-3px);
+}
+.home-scene.spat .hs-tobj,
+.home-scene.editing .hs-tobj {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  opacity: 1;
+}
+/* Clickable once they've landed; shown instantly (no fly-in) while editing. */
+.home-scene.spat .hs-tobj {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.home-scene.editing .hs-tobj {
+  transition: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-tobj {
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    transition: opacity 0.25s ease;
+  }
 }
 
 /* ================= Responsive / mobile ================= */

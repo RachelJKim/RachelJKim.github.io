@@ -2,9 +2,15 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import '../styles/navbar.css'
 
+// Full-bleed pages carry their own nav (home's trash bin, about's leaves, the
+// publications/coming-soon text nav), so the top bar is hidden on them.
+const FLUSH_ROUTES = ['/', '/about', '/publications', '/projects', '/misc']
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+
+  if (FLUSH_ROUTES.includes(location.pathname)) return null
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen)

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications — Rachel Kim</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ── frozen title (absolute on desktop; flows on top for mobile) ──── -->
+  <h1 class="pagetitle">Publications</h1>
+  <div class="meta" id="meta"></div>
+
+  <!-- ── the inner window: the paper + the list scroll through here ──── -->
+  <div class="port" id="port" tabindex="0" role="region" aria-label="Publications, scrollable">
+
+    <!-- the hanging sheet: one continuous paper, torn at the end -->
+    <aside class="railcol" aria-hidden="true">
+      <div class="rail" id="rail"></div>
+      <div class="tail" id="tail"></div>
+    </aside>
+
+    <!-- the list -->
+    <main class="col">
+      <ol class="list" id="list"></ol>
+    </main>
+
+  </div>
+
+  <!-- ── frozen overlays: they sit outside the port and never scroll ─── -->
+
+  <!-- a white band so entries dissolve behind the title as they scroll up -->
+  <div class="topcover" aria-hidden="true"></div>
+
+  <!-- the roll: sticky head, spinning cylinder, label -->
+  <div class="head" aria-hidden="true">
+    <img src="assets/roll.png" alt="">
+    <canvas id="spin" width="520" height="416"></canvas>
+  </div>
+
+</div>
+
+<script src="js/publications.js" defer></script>
+<script src="js/roll.js" defer></script>
+</body>
+</html>
