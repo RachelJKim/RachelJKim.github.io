@@ -10,6 +10,10 @@
 .home-scene.editing [data-edit].is-selected {
   outline: 2px solid #3b82f6;
 }
+/* Don't let inner links steal clicks / navigate while arranging the layout. */
+.home-scene.editing .hcitechlab-link {
+  pointer-events: none;
+}
 
 .scene-editor {
   position: fixed;

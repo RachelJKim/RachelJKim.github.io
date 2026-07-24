@@ -61,19 +61,63 @@
   letter-spacing: 0.01em;
 }
 
-/* ---------- Notes + grad polaroid (Rachel's artwork, one image) ---------- */
+/* ---------- Notes: paper+polaroid background with overlaid text ---------- */
 .hs-notes {
   position: absolute;
   left: var(--x);
   top: var(--y);
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   width: var(--w);
+  container-type: inline-size;
 }
-.hs-notes img {
+.hs-notes-bg {
   display: block;
   width: 100%;
   height: auto;
 }
+
+/* The intro text (transparent SVG) sits over the paper. Its own box so the
+   HCITechLab link can be placed as a % of the text; left/top/width/rotate come
+   inline from data/homeScene.js (placeable in the /?edit layout tool). */
+.hs-notes-text {
+  position: absolute;
+  transform-origin: left top;
+}
+.hs-notes-textimg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Transparent hotspot over the "HCITechLab" word — a soft static underline hints
+   it's a link; a black one sweeps in left→right on hover. (ideas/about-text.) */
+.hcitechlab-link {
+  position: absolute;
+  top: 14%;
+  left: 21%;
+  width: 24%;
+  height: 9%;
+  cursor: pointer;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.28);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.hcitechlab-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s ease;
+}
+.hcitechlab-link:hover {
+  border-bottom-color: transparent; /* hand off to the animated underline */
+  transform: translateY(-2px);
+}
+.hcitechlab-link:hover::before { transform: scaleX(1); }
 
 /* ---------- Trashbin doodle ---------- */
 .hs-trash {

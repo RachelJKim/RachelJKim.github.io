@@ -18,7 +18,12 @@ export default function Home() {
   const [layout, setLayout] = useState(loadLayout)
   const [selected, setSelected] = useState('character')
   const characterRef = useRef(null)
+  const notesRef = useRef(null)
   const dragRef = useRef(null)
+
+  // Elements positioned in cqw *inside* another element drag relative to that
+  // parent's width (rather than in vw/vh against the viewport).
+  const REL_PARENT = { eyeL: characterRef, eyeR: characterRef, notesText: notesRef }
 
   useEffect(() => {
     document.body.classList.add('home-scene-body')
@@ -31,8 +36,9 @@ export default function Home() {
   // Trash-bin is a nav button; destination TBD (see message to Rachel).
   const handleTrashNav = () => {}
 
-  // Drag-to-move in edit mode. Groups move in vw/vh; eyes move in cqw (relative to
-  // the character's width). Pointer capture keeps the drag alive off-element.
+  // Drag-to-move in edit mode. Top-level groups move in vw/vh against the viewport;
+  // elements inside another (eyes, notes text) move in cqw against their parent's
+  // width. Pointer capture keeps the drag alive off-element.
   const dragProps = (key) => {
     if (!editMode) return {}
     return {
@@ -42,24 +48,24 @@ export default function Home() {
         e.stopPropagation()
         e.currentTarget.setPointerCapture?.(e.pointerId)
         const el = layout[key]
-        const isEye = key === 'eyeL' || key === 'eyeR'
+        const parentRef = REL_PARENT[key]
         dragRef.current = {
           key,
-          isEye,
+          rel: !!parentRef,
           startX: e.clientX,
           startY: e.clientY,
-          sx: isEye ? el.leftCqw : el.leftVw,
-          sy: isEye ? el.topCqw : el.topVh,
-          charW: characterRef.current?.getBoundingClientRect().width || 1,
+          sx: parentRef ? el.leftCqw : el.leftVw,
+          sy: parentRef ? el.topCqw : el.topVh,
+          parentW: parentRef?.current?.getBoundingClientRect().width || 1,
         }
         setSelected(key)
       },
       onPointerMove: (e) => {
         const d = dragRef.current
         if (!d || d.key !== key) return
-        if (d.isEye) {
-          const dx = ((e.clientX - d.startX) / d.charW) * 100
-          const dy = ((e.clientY - d.startY) / d.charW) * 100
+        if (d.rel) {
+          const dx = ((e.clientX - d.startX) / d.parentW) * 100
+          const dy = ((e.clientY - d.startY) / d.parentW) * 100
           update(key, { leftCqw: round(d.sx + dx), topCqw: round(d.sy + dy) })
         } else {
           const dx = ((e.clientX - d.startX) / window.innerWidth) * 100
@@ -82,6 +88,7 @@ export default function Home() {
   const eR = layout.eyeR
   const cap = layout.caption
   const n = layout.notes
+  const nt = layout.notesText
   const tr = layout.trash
 
   return (
@@ -127,13 +134,37 @@ export default function Home() {
         ask me about rachel !
       </p>
 
-      {/* Notes + grad polaroid — Rachel's original artwork, one piece */}
+      {/* Notes: crumpled-paper + polaroid background (email is baked into the image),
+          with the intro text overlaid on top — a separately-placeable transparent
+          SVG whose "HCITechLab" is a hover link. */}
       <div
+        ref={notesRef}
         className={`hs-notes${sel('notes')}`}
         style={{ '--x': `${n.leftVw}vw`, '--y': `${n.topVh}vh`, '--w': `${n.widthVw}vw`, '--rot': `${n.rot || 0}deg` }}
         {...dragProps('notes')}
       >
-        <img src="/images/home/notes-about.png" alt="I am a master's student in HCITechLab, KAIST. I research and prototype new interactive systems :) I like to think about how future interfaces can reshape the way we perceive and interact with the world. email: luxo@racheljk.me" draggable="false" />
+        <img className="hs-notes-bg" src="/images/home/home-notes.png" alt="" draggable="false" />
+        <div
+          className={`hs-notes-text${sel('notesText')}`}
+          style={{ left: `${nt.leftCqw}cqw`, top: `${nt.topCqw}cqw`, width: `${nt.widthCqw}cqw`, transform: `rotate(${nt.rot || 0}deg)` }}
+          {...dragProps('notesText')}
+        >
+          <img
+            className="hs-notes-textimg"
+            src="/images/home/notes-text.svg"
+            alt="I am a master's student in HCITechLab, KAIST. I research and prototype new interactive systems :) I like to think about how future interfaces can reshape the way we perceive and interact with the world."
+            draggable="false"
+          />
+          {/* transparent hotspot over the "HCITechLab" handwriting */}
+          <a
+            className="hcitechlab-link"
+            href="https://hcitech.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="HCITech Lab"
+            title="HCITech Lab"
+          />
+        </div>
       </div>
 
       {/* Trashbin — animated nav button (lid opens + bits pop out on hover) */}

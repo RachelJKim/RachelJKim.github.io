@@ -13,6 +13,9 @@ export const DEFAULT_LAYOUT = {
   eyeR:      { leftCqw: 51, topCqw: 14, sizeCqw: 47, rot: 4 },
   caption:   { leftVw: 18,  topVh: 84,  fontVw: 1.7 },
   notes:     { leftVw: 70,  topVh: 50,  widthVw: 50, rot: 0 },
+  // The intro text overlaid on the notes paper. Positioned in cqw (% of the notes
+  // group's width) so it drags/scales with the paper.
+  notesText: { leftCqw: 3,  topCqw: 15, widthCqw: 44, rot: -3 },
   trash:     { leftVw: 93,  topVh: 87,  widthVw: 5.5, rot: -3 },
 }
 
@@ -24,6 +27,7 @@ export const FIELDS = {
   eyeR:      ['leftCqw', 'topCqw', 'sizeCqw', 'rot'],
   caption:   ['leftVw', 'topVh', 'fontVw'],
   notes:     ['leftVw', 'topVh', 'widthVw', 'rot'],
+  notesText: ['leftCqw', 'topCqw', 'widthCqw', 'rot'],
   trash:     ['leftVw', 'topVh', 'widthVw', 'rot'],
 }
 
