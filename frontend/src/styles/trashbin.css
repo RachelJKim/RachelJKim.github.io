@@ -11,6 +11,8 @@
   line-height: 0;
   -webkit-tap-highlight-color: transparent;
   outline: none;
+  /* so the popped items can size relative to the bin (cqw) */
+  container-type: inline-size;
 }
 
 /* The body image defines the button's box (width from the inline style, height auto). */
@@ -44,21 +46,58 @@
    translateY is a % of the lid's own height, so the motion scales with `size`. */
 @keyframes tb-lid-idle {
   0%, 55%  { transform: translateY(0)     rotate(0deg); }
-  63%      { transform: translateY(-4%)   rotate(-3deg); }
-  71%      { transform: translateY(-1.5%) rotate(1.6deg); }
-  79%      { transform: translateY(-3%)   rotate(-1.8deg); }
-  88%      { transform: translateY(-0.6%) rotate(0.6deg); }
+  63%      { transform: translateY(-4%)   rotate(3deg); }
+  71%      { transform: translateY(-1.5%) rotate(-1.6deg); }
+  79%      { transform: translateY(-3%)   rotate(1.8deg); }
+  88%      { transform: translateY(-0.6%) rotate(-0.6deg); }
   100%     { transform: translateY(0)     rotate(0deg); }
 }
 
-/* Hover / keyboard focus: livelier, continuous bob to pull the eye. */
+/* Hover / keyboard focus: the lid swings open, holds, then shuts — looping with a
+   short beat closed. Kept in sync with the items popping out (below). */
 .trashbin:hover .trashbin-lid,
 .trashbin:focus-visible .trashbin-lid {
-  animation: tb-lid-hover 0.9s ease-in-out infinite;
+  animation: tb-lid-open 1.8s ease-in-out infinite;
 }
-@keyframes tb-lid-hover {
-  0%, 100% { transform: translateY(-2%) rotate(-1.2deg); }
-  50%      { transform: translateY(-6%) rotate(2deg); }
+@keyframes tb-lid-open {
+  0%        { transform: translateY(0)   rotate(0deg); }    /* closed */
+  12%       { transform: translateY(-6%) rotate(-18deg); }  /* swinging open */
+  30%, 50%  { transform: translateY(-8%) rotate(-27deg); }  /* held open */
+  68%       { transform: translateY(0)   rotate(0deg); }    /* shut */
+  100%      { transform: translateY(0)   rotate(0deg); }    /* beat closed */
+}
+
+/* Bits that pop out of the bin while it's open. A zero-size anchor at the bin
+   mouth; each item is centred on it, then flung up/out by tb-pop. */
+.tb-items {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.tb-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 30cqw;
+  line-height: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.3);
+  will-change: transform, opacity;
+}
+.trashbin:hover .tb-item,
+.trashbin:focus-visible .tb-item {
+  animation: tb-pop 1.8s ease-out infinite;
+  /* per-item animation-delay comes from the inline style (stagger) */
+}
+@keyframes tb-pop {
+  0%, 10% { opacity: 0; transform: translate(-50%, -50%) translate(0, 25%) scale(0.3) rotate(0deg); }
+  26%     { opacity: 1; transform: translate(-50%, -50%) translate(calc(var(--dx) * 0.5), -120%) scale(1) rotate(calc(var(--r) * 0.6)); }
+  42%     { opacity: 1; transform: translate(-50%, -50%) translate(var(--dx), -175%) scale(1) rotate(var(--r)); }
+  58%     { opacity: 0; transform: translate(-50%, -50%) translate(calc(var(--dx) * 1.15), -110%) scale(0.75) rotate(calc(var(--r) * 1.2)); }
+  100%    { opacity: 0; transform: translate(-50%, -50%) translate(0, 25%) scale(0.3) rotate(0deg); }
 }
 
 /* Press: lid flips open, as if to catch what you're tossing. */
@@ -85,9 +124,15 @@
   .trashbin:hover .trashbin-lid,
   .trashbin:focus-visible .trashbin-lid {
     animation: none;
-    transform: translateY(-4%) rotate(-3deg);
+    transform: translateY(-8%) rotate(-16deg); /* just hold the lid open */
   }
   .trashbin:active .trashbin-lid {
     transform: translateY(-8%) rotate(-10deg);
+  }
+  /* No flying bits under reduced motion. */
+  .trashbin:hover .tb-item,
+  .trashbin:focus-visible .tb-item {
+    animation: none;
+    opacity: 0;
   }
 }

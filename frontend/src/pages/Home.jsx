@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
 import SceneEditor from '../components/SceneEditor'
+import TrashBin from '../components/TrashBin'
 import { loadLayout, saveLayout, DEFAULT_LAYOUT } from '../data/homeScene'
 import '../styles/home.css'
 
@@ -26,6 +27,9 @@ export default function Home() {
 
   const round = (n) => Math.round(n * 10) / 10
   const update = (key, patch) => setLayout((L) => ({ ...L, [key]: { ...L[key], ...patch } }))
+
+  // Trash-bin is a nav button; destination TBD (see message to Rachel).
+  const handleTrashNav = () => {}
 
   // Drag-to-move in edit mode. Groups move in vw/vh; eyes move in cqw (relative to
   // the character's width). Pointer capture keeps the drag alive off-element.
@@ -132,13 +136,12 @@ export default function Home() {
         <img src="/images/home/notes-about.png" alt="I am a master's student in HCITechLab, KAIST. I research and prototype new interactive systems :) I like to think about how future interfaces can reshape the way we perceive and interact with the world. email: luxo@racheljk.me" draggable="false" />
       </div>
 
-      {/* Trashbin doodle */}
-      <img
+      {/* Trashbin — animated nav button (lid opens + bits pop out on hover) */}
+      <TrashBin
         className={`hs-trash${sel('trash')}`}
         style={{ '--x': `${tr.leftVw}vw`, '--y': `${tr.topVh}vh`, '--w': `${tr.widthVw}vw`, '--rot': `${tr.rot || 0}deg` }}
-        src="/images/trashbin/trashbin.png"
-        alt=""
-        draggable="false"
+        label="Trash"
+        onClick={editMode ? undefined : handleTrashNav}
         {...dragProps('trash')}
       />
 
