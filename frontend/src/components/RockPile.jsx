@@ -66,7 +66,7 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone, well
     const DATA = ROCK_DATA
     const maxA = Math.max(...DATA.rocks.map((r) => r.area))
     let S = 1
-    let localW = 0, localH = 0   // stage's own (pre-rotation) size in px; used to map the cursor
+    let localW = 0   // stage's own (pre-rotation) width in px; used to map the cursor
 
     const rocks = DATA.rocks.map((r) => {
       const img = new Image()
@@ -106,7 +106,7 @@ export default function RockPile({ intro = true, onIntroStart, onIntroDone, well
         S = Math.max(vw / DATA.canvas.w, vh / DATA.canvas.h)
       }
       const pw = DATA.canvas.w * S, ph = DATA.canvas.h * S   // stage's own (unrotated) size
-      localW = pw; localH = ph
+      localW = pw
       stage.style.width = pw + 'px'
       stage.style.height = ph + 'px'
       stage.style.transform = landscapeMode

@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Node / build (the app lives in frontend/, which has its own .gitignore too)
+node_modules
+dist
+*.local
+*.log
