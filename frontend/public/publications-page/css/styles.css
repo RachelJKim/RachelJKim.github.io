@@ -45,14 +45,19 @@
 }
 
 :root {
-  /* one design unit -> pixels */
-  --s: min(calc((100vw - 72px) / 1024.5), 1.75px);
+  /* one design unit -> pixels. The horizontal gutter is proportional (4vw total, ~2vw a
+     side) instead of a fixed 72px, so the side padding shrinks as the window narrows
+     rather than staying put until the vertical breakpoint. Capped at 1.75px on wide
+     screens, where the stage centres with its own margins. */
+  --s: min(calc((100vw - 4vw) / 1024.5), 1.75px);
 
   --ink:    #000;
   --pencil: #b4b4b4;   /* the hand-drawn frame grey, sampled from the SVG */
   --muted:  #9a9a9a;   /* entries that have scrolled past */
   --paper:  #fff;      /* the page */
-  --sheet:  #f4f3f0;   /* the tissue */
+  --sheet:  #f0f2f5;   /* the tissue — a cool off-white (was warm cream #f4f3f0) so the
+                          pure-white video teasers don't read as a warm/cool clash. The
+                          grain/cloud textures are neutral gray, so this drives the hue. */
 
   /* type sizes, design units.
      Title/kicker keep the artboard size; the list runs ~10% smaller. */
@@ -362,6 +367,18 @@ body {
   white-space: nowrap;               /* keep the author list from splitting */
 }
 .pub .pub-authors .me { text-decoration: underline; text-underline-offset: calc(var(--s) * 2); }
+/* Co-author links: inherit the italic author look; a faint, thin dotted underline marks
+   them clickable without competing with the solid underline on Rachel's own name. It
+   firms up (solid, full ink) on hover/focus. */
+.pub .pub-authors a {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--muted);
+  text-underline-offset: calc(var(--s) * 2);
+}
+.pub .pub-authors a:hover,
+.pub .pub-authors a:focus-visible { text-decoration-style: solid; text-decoration-color: currentColor; }
 
 .pub .pub-links {
   font-size: calc(var(--s) * var(--fs-links));
