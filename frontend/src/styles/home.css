@@ -5,14 +5,30 @@
    (`container-type: inline-size`); its inner bits use `cqw` (1cqw = 1% of the
    group's width) so the group scales as one piece. */
 
+/* The scene is a full-width "stage" in normal flow. Until the window's aspect passes
+   --stage-ar it is exactly the viewport (width × 100vh) — identical to a normal window,
+   no scroll. Past that aspect (too wide / short) the box's height (100vw / --stage-ar)
+   grows TALLER than the viewport, so the whole desk scales with width as one piece and
+   the page simply SCROLLS to reach the lower part — instead of the title overrunning
+   the character. `container-type: size` lets the top-level groups be placed in cqw/cqh;
+   below the threshold cqh == vh, above it everything scales with width together. */
 .home-scene {
-  position: fixed;
-  inset: 0;
+  --stage-ar: 1.9; /* aspect at which it switches from "= the viewport" to "fill width + scroll" */
+  position: relative;
+  width: 100%;
+  height: max(100vh, calc(100vw / var(--stage-ar))); /* = viewport, else taller (page scrolls) */
+  container-type: size;
   background: #ffffff;
   overflow: hidden;
   z-index: 1;
   color: #141414;
 }
+
+/* Section wrappers group the desk into full-screen scroll-snap "screens" in phone mode
+   (see the media query below). On desktop they're inert — display:contents generates no
+   box, so the groups still position absolutely on the stage and their cqw/cqh resolve
+   to .home-scene exactly as before. */
+.hs-section { display: contents; }
 
 /* ---------- Title ---------- */
 .hs-title {
@@ -49,6 +65,17 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Discourage lifting the individual artwork/title: no iOS long-press "Save Image"
+   callout, no drag ghost, and no text selection on the title. Right-click is blocked
+   in Home.jsx (onContextMenu). */
+.hs-title,
+.home-scene img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* "coming soon" note that pops above the character on hover. */
@@ -94,6 +121,22 @@
   font-family: var(--font-slab);
   font-size: var(--font);
   letter-spacing: 0.01em;
+}
+/* Desktop shows "ask me about rachel !"; the mobile media query swaps in "coming soon". */
+.hs-caption-soon { display: none; }
+
+/* Subtle "more below" hint: a soft gradient fade along the bottom of the hero screen,
+   with an ambient wide double-chevron drifting down over it (drawn in ::after, phone only).
+   Shown only in the phone layout (see the media query). */
+.hs-scroll-cue { display: none; }
+
+/* gentle bob for the chevron — barely there, just enough to read as "scrollable" */
+@keyframes hs-cue-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 0.5; }
+  50%      { transform: translateX(-50%) translateY(4px); opacity: 0.78; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-scroll-cue::after { animation: none; }
 }
 
 /* ---------- Notes: paper+polaroid background with overlaid text ---------- */
@@ -203,15 +246,16 @@
 
 /* ---------- CV: profile polaroid + "curriculum vitae" text (a link) ---------- */
 .hs-cv {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  position: absolute;         /* inside .hs-notes; left/top/width come inline in cqw */
+  transform-origin: left top; /* like .hs-notes-text / .hs-contact */
   container-type: inline-size;
   display: block;
   cursor: pointer;
   text-decoration: none;
+  /* Cancel the global `a { transition: all 500ms }` (from style.css): without this
+     the cqw position glides on resize while the paper snaps — the two look detached.
+     Hover effects live on the child img/text, which keep their own transitions. */
+  transition: none;
 }
 .hs-cv:focus-visible { outline: none; }
 .hs-cv-img {
@@ -274,21 +318,28 @@
   transform: translate(-50%, -50%) translateY(-3px) rotate(var(--rot, 0deg));
 }
 
-/* Nav-button objects (Publications / Projects / Misc). They start hidden *inside*
-   the bin, then fly out to their placements once `.spat` is added on load (the
-   entrance animation). In `.editing` they're shown statically for placement.
-   --bin-dx/--bin-dy = offset from placement back to the bin. */
-.hs-tobj {
+/* Nav-button objects (Publications / Projects / Misc). They live inside the notes
+   group: the slot carries the cqw resting position (so it rides the paper on resize,
+   with no glide), and the inner button runs the fly-out. They start hidden *inside*
+   the bin, then fly to their spots once `.spat` is added (bin click). In `.editing`
+   they're shown statically for placement. --bin-dx/--bin-dy = the offset (in cqw of
+   the notes) from the resting spot back to the bin, computed in Home.jsx. */
+.hs-tobj-slot {
   position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
+  /* left/top (the button's CENTRE) + width come inline in cqw, relative to .hs-notes */
+  transform: translate(-50%, -50%); /* centre on the point; no transition → snaps on resize */
+}
+.hs-tobj {
+  display: block;
+  width: 100%;                 /* the slot carries the cqw width */
   padding: 0;
   border: none;
   background: none;
   line-height: 0;
   container-type: inline-size; /* so the label can size in cqw */
-  transform: translate(-50%, -50%) translate(var(--bin-dx), var(--bin-dy)) rotate(-140deg) scale(0.12);
+  transform-origin: center;
+  /* Hidden state: parked in the bin — offset there, shrunk, tilted. */
+  transform: translate(var(--bin-dx, 0), var(--bin-dy, 0)) rotate(-140deg) scale(0.12);
   opacity: 0;
   pointer-events: none;
   transition: transform 0.7s cubic-bezier(0.18, 0.7, 0.24, 1), opacity 0.25s ease;
@@ -331,7 +382,7 @@
 }
 .home-scene.spat .hs-tobj,
 .home-scene.editing .hs-tobj {
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  transform: rotate(var(--rot, 0deg)); /* size-independent → no glide on resize */
   opacity: 1;
 }
 /* Clickable once they've landed; shown instantly (no fly-in) while editing. */
@@ -345,7 +396,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hs-tobj {
-    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    transform: rotate(var(--rot, 0deg));
     transition: opacity 0.25s ease;
   }
 }
@@ -354,25 +405,73 @@
 /* Portrait or narrow screens: the fixed landscape composition would collide, so
    stack the groups vertically down a scrollable column instead. */
 @media (max-aspect-ratio: 1/1), (max-width: 760px) {
-  /* Back into normal flow so the column can scroll. */
+  /* Undo the desktop "stage" sizing and make .home-scene a full-screen snap scroller:
+     each .hs-section is one screen, and a scroll gesture snaps to the next. */
   .home-scene {
     position: relative;
     inset: auto;
-    overflow: visible;
-    min-height: 100dvh;
+    left: auto;
+    transform: none;
+    width: auto;
+    height: 100dvh;
+    aspect-ratio: auto;
+    container-type: normal;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Each screen fills the viewport and is a snap stop; the group layout (gap/padding
+     that used to be on .home-scene) lives here now. */
+  .hs-section {
+    box-sizing: border-box; /* keep min-height:100dvh INCLUDING padding = exactly one screen */
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 4vh;
-    padding: 9vh 6vw 12vh;
+    min-height: 100dvh;
+    padding: 6vh 6vw;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
-  /* The spit-out objects are a desktop flourish; skip them in the stacked layout. */
-  .hs-tobj { display: none; }
+  /* A soft gradient pinned to the bottom of the screen, hinting there's more below.
+     Fixed to the viewport (not the hero's height, which was letting it fall below the
+     fold on the first screen), and it fades out once you've scrolled onto the last
+     screen — Home.jsx toggles .past-hero on the scroller. */
+  .hs-scroll-cue {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 20vh;
+    background: linear-gradient(to top, rgba(20, 20, 20, 0.4), rgba(20, 20, 20, 0.16) 45%, transparent);
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.4s ease;
+  }
+  /* Ambient wide double-chevron near the bottom — a faint "scroll for more" arrow. */
+  .hs-scroll-cue::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4.5vh;
+    width: 46px;
+    height: 27px;
+    transform: translateX(-50%);
+    opacity: 0.5;
+    background: center / contain no-repeat
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='28'%20viewBox='0%200%2048%2028'%20fill='none'%20stroke='%23ffffff'%20stroke-width='2.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%204%20L24%2015%20L42%204%20M6%2014%20L24%2025%20L42%2014'/%3E%3C/svg%3E");
+    animation: hs-cue-bob 1.9s ease-in-out infinite;
+  }
+  .home-scene.past-hero .hs-scroll-cue { opacity: 0; }
+  /* The nav objects ride the notes (positioned in cqw), so they carry into the
+     stacked layout too and still fly out of the bin below. */
   .hs-title,
   .hs-character,
   .hs-caption,
   .hs-notes,
-  .hs-cv,
   .hs-trash {
     position: relative;
     left: auto;
@@ -380,10 +479,8 @@
     right: auto;
     margin: 0 auto;
   }
-  .hs-cv {
-    transform: rotate(3deg);
-    width: min(48vw, 240px);
-  }
+  /* .hs-cv now lives inside .hs-notes (positioned in cqw), so it rides along with
+     the paper here too — no separate stacked-column rule needed. */
   .hs-title {
     transform: none;
     font-size: clamp(40px, 15vw, 96px);
@@ -397,6 +494,13 @@
     transform: none;
     font-size: clamp(16px, 5vw, 22px);
   }
+  /* Phone layout: touch makes :hover sticky, so rather than popping the "coming soon"
+     bubble above the character (dropped here), the LOWER caption carries it — it reads
+     "ask me about rachel !" by default and swaps to "coming soon" while the character
+     is tapped. */
+  .hs-coming-soon { display: none; }
+  .home-scene:not(.editing) .hs-character:hover ~ .hs-caption .hs-caption-ask { display: none; }
+  .home-scene:not(.editing) .hs-character:hover ~ .hs-caption .hs-caption-soon { display: inline; }
   .hs-notes {
     transform: none;
     width: min(94vw, 620px);
@@ -405,5 +509,16 @@
     transform: rotate(-3deg);
     width: min(20vw, 90px);
     align-self: flex-end;
+  }
+  /* Touch taps trigger :hover, but the desktop hover transforms assume the centered
+     (translate(-50%,-50%)) desktop layout — in this stacked column that would jump the
+     element by half its size on tap. Pin hover to the resting transform so it stays put
+     (the lid-open / eyes still animate; only the position lift is dropped). */
+  .home-scene:not(.editing) .hs-character:hover {
+    transform: none;
+  }
+  .home-scene:not(.editing) .hs-trash:hover,
+  .home-scene:not(.editing) .hs-trash:focus-visible {
+    transform: rotate(-3deg);
   }
 }

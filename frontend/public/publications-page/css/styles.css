@@ -377,8 +377,11 @@ body {
 
 /* ═══ small screens: the roll steps aside, the page becomes a page ══ */
 
-@media (max-width: 760px) {
-  :root { --s: calc((100vw - 40px) / 420); }
+/* Narrow OR portrait (incl. a tall desktop window): drop the landscape roll and become
+   a normal scrolling page. The roll's internal .port scroll misbehaves on tall portrait
+   windows (gets stuck at the bottom), and the roll is a landscape flourish anyway. */
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  :root { --s: min(calc((100vw - 40px) / 420), 1.1px); } /* cap so it doesn't balloon on wide portrait */
 
   html, body { overflow: auto; height: auto; }
 
@@ -391,11 +394,18 @@ body {
     -webkit-mask-image: none; mask-image: none;
   }
 
+  /* Rows run the full width on phones — drop the desktop right gap that aligned them
+     to the "Publications" title. */
+  .list { padding-right: 0; }
+
   .railcol, .head, .topcover { display: none; }
 
   .pagetitle {
     position: static; white-space: normal;
     font-size: calc(var(--s) * 54); margin-bottom: calc(var(--s) * 6);
+    /* Drop below the fixed React nav (.pub-nav, top 27px) so they don't overlap, and
+       start at the same left inset as the list rows (the port's 20px padding). */
+    margin-top: 56px; padding-left: 20px;
   }
   .meta {
     position: static; height: calc(var(--s) * 22);   /* empty spacer, keeps the gap */

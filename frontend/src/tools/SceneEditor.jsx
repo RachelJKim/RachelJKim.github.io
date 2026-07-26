@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { FIELDS } from '../data/homeScene'
-import '../styles/scene-editor.css'
+import './scene-editor.css'
 
 /* Dev-only layout editor for the Home scene. Rendered by Home when the URL has
    ?edit. Drag elements in the scene to move them; use the inputs here for fine

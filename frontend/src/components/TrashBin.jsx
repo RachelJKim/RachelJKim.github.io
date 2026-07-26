@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import '../styles/trashbin.css'
 
 /* TrashBin — a clickable trash-can button on the home scene.
@@ -22,13 +23,17 @@ import '../styles/trashbin.css'
  * @param {string} [className]     extra classes
  * @param {object} [style]         extra inline styles (merged after width)
  */
-export default function TrashBin({ size, onClick, label = 'Trash', className = '', style, ...rest }) {
+const TrashBin = forwardRef(function TrashBin(
+  { size, onClick, label = 'Trash', className = '', style, ...rest },
+  ref,
+) {
   const mergedStyle = {
     ...(size != null ? { width: typeof size === 'number' ? `${size}px` : size } : null),
     ...style,
   }
   return (
     <button
+      ref={ref}
       type="button"
       className={`trashbin ${className}`}
       style={mergedStyle}
@@ -41,4 +46,6 @@ export default function TrashBin({ size, onClick, label = 'Trash', className = '
       <img className="trashbin-lid" src="/images/trashbin/trashbin-lid.png" alt="" draggable="false" />
     </button>
   )
-}
+})
+
+export default TrashBin

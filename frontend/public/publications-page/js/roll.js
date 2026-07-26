@@ -277,6 +277,10 @@
     })();
   }
   port.addEventListener("wheel", (e) => {
+    /* Portrait / small screens hide the roll and let the page scroll natively (the .port
+       is a static block, not a scroller). Never intercept there, or an upward wheel would
+       be preventDefault'd against a port whose scrollTop is always 0 — trapping the page. */
+    if (getComputedStyle(railCol).display === "none") return;
     /* A downward scroll always wins: it cancels any bounce/lock and passes straight
        through to native scrolling, so you can scroll into the list the instant the
        paper starts coming back from the top — never intercepted, never stuck. */
