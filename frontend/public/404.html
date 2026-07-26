@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>RachelJK</title>
+    <script>
+      // SPA fallback for GitHub Pages. A deep link (e.g. /publications) has no real file
+      // on the server, so Pages serves this 404 page. We rewrite the path into a query
+      // string and bounce to the root index.html, which restores it (see the matching
+      // snippet in index.html) so React Router can render the route on a refresh / direct
+      // visit. Root custom domain (www.racheljk.me) => keep 0 leading path segments.
+      var pathSegmentsToKeep = 0;
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
