@@ -68,3 +68,12 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Page transition: every route fades in on navigation (wrapper keyed by pathname in
+   App.jsx replays it each time). Opacity-only, so full-bleed / fixed page layouts are
+   untouched. The home keeps its own richer staggered entrance on top of this. */
+@keyframes route-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.route-fade { animation: route-fade-in 0.45s ease both; }
+@media (prefers-reduced-motion: reduce) {
+  .route-fade { animation: none; }
+}

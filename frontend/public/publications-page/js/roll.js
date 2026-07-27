@@ -58,11 +58,19 @@
 
   let U = 1, CW = 0, CH = 0, R = 1, cy = 0;
 
+  /* one record per visible square, rebuilt by every place() — the tear /
+     filter layers read this instead of re-deriving the geometry */
+  let squares = [];
+
   /* ── 1 + 2 · place and join ────────────────────────────────────── */
 
   let laying = false;
   function layout() {
     if (laying) return;
+    /* js/filter.js freezes relayout while its slide animations run — the
+       ResizeObserver would otherwise rebuild every perf/frame mid-flight
+       and snap them to their final spots. The skipped pass runs after. */
+    if (window.PUB_UI && window.PUB_UI.freeze) { window.PUB_UI.pendingLayout = true; return; }
     laying = true;
     try { place(); } finally { requestAnimationFrame(() => { laying = false; }); }
   }
@@ -77,7 +85,8 @@
 
     readGeometry();
     U = unit();
-    const items = [...list.children];
+    /* filtered-out entries are display:none and own no square */
+    const items = [...list.children].filter(li => !li.classList.contains("is-filtered"));
     if (!items.length) return;
 
     /* Pin entry 01 to --lead so it always clears the roll and its gray box
@@ -96,20 +105,27 @@
     let end = 0;
     const perfTops = [], frames = [];
 
-    items.forEach((li, i) => {
+    squares = [];
+    items.forEach((li) => {
       const box = li.getBoundingClientRect();
       const y = box.top - base;
       end = box.bottom - base;
+
+      /* data-index, not DOM position: the filter can hide rows, so the two
+         may disagree — the attribute always names the right publication */
+      const idx = +li.dataset.index || 0;
 
       const perfTop = y - G["perf-lift"] * U;
       const perf = document.createElement("div");
       perf.className = "perf";
       perf.style.top = perfTop + "px";
+      perf.dataset.index = idx;
       railCol.appendChild(perf);
 
       const frame = document.createElement("div");
       frame.className = "frame";
-      const teaser = window.PUBLICATIONS[i] && window.PUBLICATIONS[i].teaser;
+      frame.dataset.index = idx;
+      const teaser = window.PUBLICATIONS[idx] && window.PUBLICATIONS[idx].teaser;
       frame.innerHTML =
         (teaser ? `<img class="shot" src="${teaser}" alt="">` : "") +
         `<img class="box" src="assets/frame.png" alt="">`;
@@ -117,6 +133,7 @@
 
       perfTops.push(perfTop);
       frames.push(frame);
+      squares.push({ index: idx, li, perf, frame, top: perfTop, bottom: 0 });
     });
 
     /* Each square runs from its own perforation to the next one's (the last
@@ -127,6 +144,7 @@
       const top    = perfTops[i];
       const bottom = (i < perfTops.length - 1) ? perfTops[i + 1] : lastBottom;
       f.style.top = (top + (bottom - top - frameH) / 2) + "px";
+      squares[i].bottom = bottom;
     });
 
     /* End the rail exactly where the tail starts, then shift the tail's
@@ -280,6 +298,7 @@
     /* Portrait / small screens hide the roll and let the page scroll natively (the .port
        is a static block, not a scroller). Never intercept there, or an upward wheel would
        be preventDefault'd against a port whose scrollTop is always 0 — trapping the page. */
+    if (document.body.classList.contains("detail-open")) return;
     if (getComputedStyle(railCol).display === "none") return;
     /* A downward scroll always wins: it cancels any bounce/lock and passes straight
        through to native scrolling, so you can scroll into the list the instant the
@@ -308,6 +327,20 @@
 
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
   if (window.ResizeObserver) new ResizeObserver(layout).observe(col);
+
+  /* ── the paper's public face ───────────────────────────────────────
+     Read by js/tear.js, js/detail.js and js/filter.js, which animate ON
+     the paper but never reach into its machinery. Everything here is a
+     getter over state place() already keeps. */
+  window.ROLL = {
+    layout,
+    unit:    () => U,
+    squares: () => squares,
+    railTop: () => parseFloat(rail.style.top) || 0,   // element top, rise included
+    railRect: () => rail.getBoundingClientRect(),
+    retick:  () => { last = -1; tick(); },
+    port, railCol, tail,
+  };
 
   /* entries dim once they pass up behind the roll — delete this block to drop it.
      The root is the port now, since that is what scrolls. */

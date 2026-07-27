@@ -11,6 +11,12 @@
      {
        venue:   "UIST 26",             // "UIST 26" -> [UIST'26]; a trailing
                                        //   qualifier is kept: "UIST 26 Demo"
+       type:    "journal",             // REQUIRED — "journal" (Journal/Conference)
+                                       //   or "demo" (Demo/Poster). Drives the
+                                       //   filter tabs under the page title.
+       id:      "dobi",                // OPTIONAL — url slug for the detail view
+                                       //   (/publications#dobi). Left out -> one
+                                       //   is derived from the title.
        title:   "Full paper title …",  // wraps freely; the frame follows it
        authors: [
          { name: "Rachel Kim", me: true },   // me:true underlines the name
@@ -25,6 +31,8 @@
                                        //   frontend/public/images/publications/ and
                                        //   match its aspect ratio to the frame.
                                        //   Leave the field out -> box stays blank.
+       abstract: "One paragraph …",    // OPTIONAL — shown only on the torn-off
+                                       //   detail sheet, never in the list.
      },
    ────────────────────────────────────────────────────────────────────
    Entries are listed newest first (time order).
@@ -62,12 +70,17 @@ const AUTHOR_LINKS = {
 window.PUBLICATIONS = [
   {
     venue: "UIST 26",
+    type: "journal",
+    id: "dobi",
     title: "DOBI: Dynamic Opportunistic Body Input via Spare Joint Recruitment for Hands-Free XR",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Xun Qian" }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
+    teaser: "/images/publications/dobi.gif",
   },
   {
     venue: "ToH 26",
+    type: "journal",
+    id: "vibgrasp",
     title: "VibGrasp: Spatiotemporal Vibration Based Multimodal Haptic Rendering with a Lightweight Exo-Glove for 3D Shape Perception",
     authors: [{ name: "Hojeong Lee" }, { name: "Eunho Kim" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
@@ -75,18 +88,24 @@ window.PUBLICATIONS = [
   },
   {
     venue: "UIST 26 SIC",
+    type: "demo",
+    id: "snap-yo-mind",
     title: "Snap-Yo-Mind: Arousal-Triggered Capture of Emotionally Salient Moments",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Donghee Hyun" }, { name: "Kyoungwhan Mheen" }],
     links: LINKS(),
   },
   {
     venue: "UIST 26 Demo",
+    type: "demo",
+    id: "dobi-demo",
     title: "Demonstrating DOBI: Dynamic Opportunistic Body Input via Spare Joint Recruitment for Hands-Free XR",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Xun Qian" }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
   },
   {
     venue: "IMWUT 25",
+    type: "journal",
+    id: "moving-press",
     title: "Moving-Press: Pressure-based Moving Phantom Sensation for Immersive VR Hand Interaction",
     authors: [{ name: "Dongkyu Kwak" }, { name: "Kyungjin Seo" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
@@ -94,18 +113,24 @@ window.PUBLICATIONS = [
   },
   {
     venue: "UIST 25 Demo",
+    type: "demo",
+    id: "rack-pinion-demo",
     title: "Pressure Movement Sensation with Rack and Pinion Based Wearable Interface",
     authors: [{ name: "DongKyu Kwak" }, { name: "Kyungjin Seo" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
   },
   {
     venue: "UIST 25 SIC",
+    type: "demo",
+    id: "tacttail",
     title: "TactTail: Expanding Multimodal, Nonverbal Communication Between Human and Dog",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Eunho Kim" }],
     links: LINKS(),
   },
   {
     venue: "IMWUT 23",
+    type: "journal",
+    id: "hapticpilot",
     title: "HapticPilot: Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality",
     authors: [{ name: "Youjin Sung" }, { name: "Rachel Kim", me: true }, { name: "Kun Woo Song" }, { name: "Yitian Shao" }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
@@ -113,6 +138,8 @@ window.PUBLICATIONS = [
   },
   {
     venue: "VRST 22 Poster",
+    type: "demo",
+    id: "vibration-intensity-map",
     title: "Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR",
     authors: [{ name: "Youjin Sung" }, { name: "Yitian Shao" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
     links: LINKS(),
@@ -129,6 +156,11 @@ window.PUBLICATIONS = [
      the space before the 2-digit year becomes an apostrophe. */
   const venueLabel = v => esc(v).replace(/\s+(\d{2})/, "&rsquo;$1");
 
+  /* url slug for the detail view: an explicit id wins, else the first few
+     title words. Kept stable so /publications#slug links keep working. */
+  const slug = p => p.id || String(p.title).toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "").trim().split(/\s+/).slice(0, 5).join("-");
+
   const list = document.getElementById("list");
 
   // case-insensitive name -> homepage lookup, built once from AUTHOR_LINKS
@@ -138,28 +170,40 @@ window.PUBLICATIONS = [
     return name => m[String(name).toLowerCase()] || "";
   })();
 
-  list.innerHTML = window.PUBLICATIONS.map(p => {
-    const authors = p.authors
-      .map(a => {
-        const label = a.me ? `<span class="me">${esc(a.name)}</span>` : esc(a.name);
-        const href = a.href || authorHref(a.name);         // explicit href wins, else the map
-        return href
-          ? `<a href="${esc(href)}" target="_blank" rel="noopener">${label}</a>`
-          : label;
-      })
-      .join(", ");
+  const authorsHTML = p => p.authors
+    .map(a => {
+      const label = a.me ? `<span class="me">${esc(a.name)}</span>` : esc(a.name);
+      const href = a.href || authorHref(a.name);           // explicit href wins, else the map
+      return href
+        ? `<a href="${esc(href)}" target="_blank" rel="noopener">${label}</a>`
+        : label;
+    })
+    .join(", ");
 
-    const links = (p.links && p.links.length)
-      ? `<p class="pub-links">${p.links.map(l => {
-          const ext = /^https?:/i.test(l.href) ? ' target="_blank" rel="noopener"' : "";
-          return `<a href="${esc(l.href)}"${ext}>${esc(l.label)}</a>`;
-        }).join(" ")}</p>`
-      : "";
+  const linksHTML = p => (p.links && p.links.length)
+    ? `<p class="pub-links">${p.links.map(l => {
+        const ext = /^https?:/i.test(l.href) ? ' target="_blank" rel="noopener"' : "";
+        return `<a href="${esc(l.href)}"${ext}>${esc(l.label)}</a>`;
+      }).join(" ")}</p>`
+    : "";
 
-    return `<li class="pub"${p.teaser ? ` data-teaser="${esc(p.teaser)}"` : ""}>
+  list.innerHTML = window.PUBLICATIONS.map((p, i) => {
+    const authors = authorsHTML(p);
+    const links = linksHTML(p);
+
+    /* data-index ties this row back to PUBLICATIONS[i] even when the filter
+       hides rows, so DOM position and array index may disagree safely.
+       The title stays a <span> (a real <button> is an atomic box, which would
+       push the authors off its last wrapped line) but acts as one — click and
+       Enter/Space are wired in js/detail.js. */
+    return `<li class="pub" data-index="${i}" data-type="${esc(p.type || "journal")}" data-id="${esc(slug(p))}"${p.teaser ? ` data-teaser="${esc(p.teaser)}"` : ""}>
         <p class="pub-venue">[${venueLabel(p.venue)}]</p>
-        <p class="pub-body"><span class="pub-title">${esc(p.title)}</span> <span class="pub-authors">(${authors})</span></p>
+        <p class="pub-body"><span class="pub-title pub-open" role="button" tabindex="0" aria-haspopup="dialog">${esc(p.title)}</span> <span class="pub-authors">(${authors})</span></p>
         ${links}
       </li>`;
   }).join("");
+
+  /* shared by js/detail.js, which rebuilds one entry at sheet size —
+     same markup builders, so list and detail can never drift apart */
+  window.PUB_HTML = { esc, venueLabel, slug, authorsHTML, linksHTML };
 })();

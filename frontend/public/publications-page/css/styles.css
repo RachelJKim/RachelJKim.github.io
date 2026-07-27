@@ -253,6 +253,7 @@ body {
   position: absolute; z-index: 2;
   left: calc(var(--s) * var(--frame-l));
   width: calc(var(--s) * var(--frame-w)); height: calc(var(--s) * var(--frame-h));
+  cursor: pointer;                      /* clicking the box tears the square off */
 }
 .frame img { position: absolute; display: block; }
 .frame .shot {
@@ -312,12 +313,31 @@ body {
   line-height: .92; letter-spacing: -.012em; white-space: nowrap;
   pointer-events: none;
 }
+/* the filter tabs live here — js/filter.js fills it. Interactive now,
+   unlike the title above it. */
 .meta {
   position: absolute; z-index: 4;
-  right: calc(var(--s) * 77.5); top: calc(var(--s) * 118);
+  right: calc(var(--s) * 77.5); top: calc(var(--s) * 147);
   font-size: calc(var(--s) * var(--fs-links)); font-style: italic;
   font-weight: 300; color: var(--muted);
-  pointer-events: none;
+  display: flex; gap: calc(var(--s) * 13);
+}
+.meta .tab {
+  font: inherit; color: inherit; letter-spacing: inherit;
+  background: none; border: 0; padding: 0; cursor: pointer;
+}
+.meta .tab:hover { color: var(--ink); }
+.meta .tab[aria-pressed="true"] {
+  color: var(--ink);
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: calc(var(--s) * 3);
+}
+
+/* screen-reader-only announcements ("Showing N publications") */
+.vh {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 
 /* ═══ one publication ═════════════════════════════════════════════ */
@@ -335,6 +355,11 @@ body {
 }
 .pub:last-child { border-bottom: 0; }
 .pub.is-out { color: var(--muted); }
+.pub.is-filtered { display: none; }   /* filtered rows own no square */
+
+/* the title doubles as the detail-view opener */
+.pub .pub-open { cursor: pointer; }
+.pub .pub-open:focus-visible { outline: 1px dotted var(--muted); outline-offset: 3px; }
 
 .pub > * { font-weight: 400; }
 
@@ -392,12 +417,121 @@ body {
 .pub .pub-links a:hover,
 .pub .pub-links a:focus-visible { text-decoration: underline; }
 
+/* ═══ tearing off: flying clones, the scrim, the huge detail sheet ═══
+   A clicked square is copied into a fixed-position .clone that tears along
+   its perforation and flies to the centre, where the .detail sheet — one
+   huge square of the same tissue — takes over. js/tear.js and js/detail.js
+   drive all of it; the filter's rip-aways reuse the same clone. */
+
+/* the wrapper carries the shadow and the flight transform; the inner carries
+   the paper recipe and the torn clip-path. On one element the clip would cut
+   the shadow off at the straight edge — split, the shadow hugs the tear. */
+.clone {
+  position: fixed; z-index: 30; pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 calc(var(--s) * 3) calc(var(--s) * 10) rgba(22,20,16,.16));
+}
+.clone-inner {
+  position: absolute; inset: 0;
+  background-color: var(--sheet);
+  /* grain / cloud / edge gradients + their phase are set inline by tear.js,
+     so the texture matches the rail underneath pixel for pixel */
+}
+.clone-inner::after {                  /* the square's own bottom perforation */
+  content: ""; position: absolute;
+  left: calc(var(--s) * 6); right: calc(var(--s) * 6);
+  bottom: 0; height: 1.6px;
+  background: repeating-linear-gradient(90deg, rgba(22,20,16,.40) 0 4px, transparent 4px 10px);
+}
+.clone .frame { cursor: default; }     /* left/top set inline by tear.js */
+
+.detail-scrim {
+  position: fixed; inset: 0; z-index: 20;
+  background: var(--paper); opacity: 0;
+  transition: opacity .3s ease;
+}
+.detail-scrim.is-on { opacity: .93; }
+
+/* centred with inset+margin auto, so transform stays free for the
+   open / blow-away animations */
+.detail {
+  position: fixed; inset: 0; margin: auto; z-index: 25;
+  width: min(calc(var(--s) * 640), 92vw);
+  height: fit-content; max-height: 86vh;
+  filter: drop-shadow(0 calc(var(--s) * 4) calc(var(--s) * 14) rgba(22,20,16,.18));
+}
+.detail-sheet {
+  /* the huge square: the .rail recipe at page tile size, torn top and
+     bottom by a clip-path that js/detail.js generates */
+  max-height: 86vh;
+  overflow-y: auto; scrollbar-width: none;
+  background-color: var(--sheet);
+  background-image:
+    url("../assets/grain.png"),
+    url("../assets/cloud.png"),
+    linear-gradient(90deg,
+      rgba(22,20,16,.10) 0, rgba(22,20,16,0) calc(var(--s) * 14),
+      rgba(22,20,16,0) calc(100% - var(--s) * 16), rgba(22,20,16,.12) 100%);
+  background-repeat: repeat, repeat, no-repeat;
+  background-size:
+    calc(var(--s) * var(--grain-tile)) calc(var(--s) * var(--grain-tile)),
+    calc(var(--s) * var(--cloud-tile)) calc(var(--s) * var(--cloud-tile)),
+    100% 100%;
+  background-blend-mode: multiply, multiply, normal;
+  padding: calc(var(--s) * 42) calc(var(--s) * 48) calc(var(--s) * 48);
+}
+.detail-sheet::-webkit-scrollbar { width: 0; height: 0; }
+
+/* content reuses the .pub markup, so author links / the underlined "me" /
+   link styling all come along for free — just undo the row chrome and
+   scale the type up to sheet size */
+.detail .pub { min-height: 0; border: 0; margin: 0; padding: 0; }
+.detail .pub .pub-venue  { font-size: calc(var(--s) * 21); }
+.detail .pub .pub-title  { font-size: calc(var(--s) * 26); line-height: 1.25; margin-right: 0; cursor: default; }
+.detail .pub .pub-body   { margin-top: calc(var(--s) * 4); }
+.detail .pub .pub-authors {
+  display: block; white-space: normal;
+  font-size: calc(var(--s) * 17); margin-top: calc(var(--s) * 8);
+}
+.detail .pub .pub-links  { font-size: calc(var(--s) * 16.5); margin-top: calc(var(--s) * 12); }
+
+.detail-abstract {
+  font-weight: 300; font-size: calc(var(--s) * 15.5);
+  line-height: 1.55; margin-top: calc(var(--s) * 14);
+}
+
+/* the teaser under the text, framed by the same hand-drawn box */
+.detail-teaser {
+  position: relative; margin-top: calc(var(--s) * 18);
+  aspect-ratio: 146.6 / 91.2;          /* the gray box's own proportions */
+}
+.detail-teaser .shot {
+  position: absolute;
+  left: calc(var(--s) * 7); top: calc(var(--s) * 7);
+  width: calc(100% - var(--s) * 14); height: calc(100% - var(--s) * 14);
+  object-fit: cover;
+}
+.detail-teaser .box { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.detail-close {
+  position: absolute; z-index: 2;
+  top: calc(var(--s) * 12); right: calc(var(--s) * 14);
+  font: inherit; font-size: calc(var(--s) * 20); line-height: 1;
+  color: var(--pencil); background: none; border: 0;
+  padding: calc(var(--s) * 5); cursor: pointer;
+}
+.detail-close:hover,
+.detail-close:focus-visible { color: var(--ink); }
+
+/* freeze the paper while a sheet is torn off (scrollTop survives hidden) */
+body.detail-open .port { overflow-y: hidden; }
+
 /* ═══ small screens: the roll steps aside, the page becomes a page ══ */
 
 /* Narrow OR portrait (incl. a tall desktop window): drop the landscape roll and become
    a normal scrolling page. The roll's internal .port scroll misbehaves on tall portrait
    windows (gets stuck at the bottom), and the roll is a landscape flourish anyway. */
-@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+@media (max-width: 750px), (max-aspect-ratio: 1/1) {
   :root { --s: min(calc((100vw - 40px) / 420), 1.1px); } /* cap so it doesn't balloon on wide portrait */
 
   html, body { overflow: auto; height: auto; }
@@ -425,8 +559,17 @@ body {
     margin-top: 56px; padding-left: 20px;
   }
   .meta {
-    position: static; height: calc(var(--s) * 22);   /* empty spacer, keeps the gap */
+    position: static;
+    padding-left: 20px; margin-bottom: calc(var(--s) * 14);
+    font-size: calc(var(--s) * 17); gap: calc(var(--s) * 16);
   }
+
+  /* no squares here, so no clones or tears — the sheet just fills the phone */
+  .clone { display: none; }
+  .detail { width: calc(100vw - 24px); max-height: 92vh; }
+  .detail-sheet { max-height: 92vh; }
+  html.detail-open, html.detail-open body { overflow: hidden; }
+
   .pub { min-height: 0; }
   .pub.is-out { color: var(--ink); }   /* nothing dims when the page just scrolls */
   .pub .pub-authors { white-space: normal; margin-left: 0; }
@@ -435,4 +578,5 @@ body {
 @media (prefers-reduced-motion: reduce) {
   #spin { opacity: .5; }
   .pub { transition: none; }
+  .detail-scrim { transition: opacity .15s ease; }
 }

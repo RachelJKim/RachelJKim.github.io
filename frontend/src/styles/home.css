@@ -139,6 +139,34 @@
   .hs-scroll-cue::after { animation: none; }
 }
 
+/* ---------- First-load entrance ----------
+   The desk pieces fade in in a gentle sequence when the home mounts, so landing feels
+   smooth instead of snapping in all at once. Opacity only, so each piece keeps its own
+   centering / rotation transform untouched. Skipped in the editor; disabled for reduced
+   motion. (Replays on any home mount — e.g. navigating back to it.) */
+@keyframes hs-enter { from { opacity: 0; } to { opacity: 1; } }
+
+.home-scene:not(.editing) .hs-title,
+.home-scene:not(.editing) .hs-character,
+.home-scene:not(.editing) .hs-notes,
+.home-scene:not(.editing) .hs-caption,
+.home-scene:not(.editing) .hs-trash {
+  animation: hs-enter 0.7s ease-out both;
+}
+.home-scene:not(.editing) .hs-title     { animation-delay: 0.04s; }
+.home-scene:not(.editing) .hs-character { animation-delay: 0.16s; }
+.home-scene:not(.editing) .hs-notes     { animation-delay: 0.28s; }
+.home-scene:not(.editing) .hs-caption   { animation-delay: 0.40s; }
+.home-scene:not(.editing) .hs-trash     { animation-delay: 0.50s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-scene .hs-title,
+  .home-scene .hs-character,
+  .home-scene .hs-notes,
+  .home-scene .hs-caption,
+  .home-scene .hs-trash { animation: none; }
+}
+
 /* ---------- Notes: paper+polaroid background with overlaid text ---------- */
 .hs-notes {
   position: absolute;
