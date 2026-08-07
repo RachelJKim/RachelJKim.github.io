@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>googly eyes &mdash; luxo lamp / dark mode prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Prototype for the home hero: click the Luxo-style desk lamp → the page goes
+     dark, the lamp lights the character in a warm cone, and the googly eyes close
+     into a squint (real eyelid assets cut from the socket art) and STAY squinted
+     until the light comes back. To be ported into frontend/ Home later. */
+  :root{
+    --ink:#111;
+    --paper:#ffffff;
+    --night:#070708;
+    --glow:#ffe9b0;
+    --travel:0.183;          /* pupil max travel, fraction of eye width */
+    --pupratio:0.5536;       /* pupil width / eye width */
+    --mode-t:.45s;           /* light<->dark fade */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Spline Sans Mono",monospace;
+    color:var(--ink);
+    background:var(--paper);
+    min-height:100dvh;
+    overflow:hidden;
+    transition:background-color var(--mode-t) ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  body.dark{ background:var(--night); }
+
+  /* ---------- hero copy (stands in for the real title/caption) ---------- */
+  .title{
+    position:fixed;left:6vw;top:7vh;z-index:4;
+    font-family:"Caveat",cursive;
+    font-size:clamp(40px,7vw,84px);
+    line-height:.95;
+    transition:color var(--mode-t) ease;
+    user-select:none;
+  }
+  .dark .title{ color:#3a3a3c; }
+
+  .caption{
+    position:fixed;left:50vw;top:88vh;transform:translateX(-50%);z-index:4;
+    font-size:clamp(12px,1.4vw,16px);letter-spacing:.5px;
+    transition:color var(--mode-t) ease;
+    user-select:none;
+  }
+  .dark .caption{ color:#e9ddc2; }
+
+  /* ---------- Luxo-style desk lamp (click to toggle) ---------- */
+  .lamp{
+    position:fixed;left:17vw;bottom:5vh;z-index:6;
+    width:clamp(160px,17vw,240px);
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+    background:none;border:none;padding:0;
+  }
+  .lamp:focus-visible{outline:3px dashed #888;outline-offset:8px;border-radius:12px}
+  .lamp svg{display:block;width:100%;height:auto;overflow:visible}
+  .lamp .stroke{fill:none;stroke:var(--ink);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;
+    transition:stroke var(--mode-t) ease}
+  .lamp .sketch{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linecap:round;opacity:.45;
+    transition:stroke var(--mode-t) ease}
+  .lamp .fill-paper{fill:var(--paper);transition:fill var(--mode-t) ease}
+  .dark .lamp .stroke,
+  .dark .lamp .sketch{stroke:#d8cdb4}
+  .dark .lamp .fill-paper{fill:#141412}
+  .lamp .bulb{
+    fill:#fff;stroke:var(--ink);stroke-width:2.6;
+    transition:fill var(--mode-t) ease, stroke var(--mode-t) ease, filter var(--mode-t) ease;
+  }
+  .dark .lamp .bulb{
+    fill:#ffd76a;stroke:#8a6a1e;
+    filter:drop-shadow(0 0 10px rgba(255,215,106,.95)) drop-shadow(0 0 28px rgba(255,215,106,.55));
+    animation:flicker-on .75s linear both;
+  }
+  /* the little Luxo hop when clicked */
+  .lamp.hopping svg{
+    transform-origin:28% 96%;
+    animation:hop .8s cubic-bezier(.34,1.3,.5,1) both;
+  }
+  @keyframes hop{
+    0%{transform:none}
+    28%{transform:translateY(-7%) rotate(-3deg)}
+    55%{transform:translateY(0) scaleY(.955)}
+    74%{transform:translateY(-2.2%) rotate(1.2deg)}
+    100%{transform:none}
+  }
+  .hint{
+    position:fixed;z-index:6;
+    left:calc(17vw + clamp(160px,17vw,240px)*0.15);bottom:1.5vh;
+    font-size:12px;letter-spacing:1px;color:#999;
+    transition:opacity .4s ease, color var(--mode-t) ease;
+    pointer-events:none;
+  }
+  .dark .hint{color:#5b5647}
+  .hint.used{opacity:0}
+
+  /* ---------- the light itself ---------- */
+  /* cone: apex is pinned to the lamp's bulb by JS and rotated to aim at the
+     character; width/height also set by JS from the actual distance. */
+  .cone{
+    position:fixed;z-index:1;pointer-events:none;
+    transform-origin:top center;
+    clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+    background:linear-gradient(180deg,
+      rgba(255,233,176,.98) 0%,
+      rgba(255,233,176,.42) 45%,
+      rgba(255,233,176,.14) 78%,
+      rgba(255,233,176,0) 100%);
+    filter:blur(10px);
+    opacity:0;transition:opacity var(--mode-t) ease;
+  }
+  /* warm pool the character sits in, so the ink stays visible on black */
+  .pool{
+    position:fixed;z-index:1;pointer-events:none;
+    left:50vw;top:66vh;
+    width:min(64vw,760px);height:44vh;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(50% 50% at 50% 50%,
+      rgba(255,236,190,.92) 0%,
+      rgba(255,236,190,.55) 45%,
+      rgba(255,236,190,0) 72%);
+    filter:blur(6px);
+    opacity:0;transition:opacity var(--mode-t) ease;
+  }
+  .dark .cone,.dark .pool{opacity:1;animation:flicker-on .75s linear both}
+  @keyframes flicker-on{
+    0%{opacity:0} 34%{opacity:0} 40%{opacity:.75} 47%{opacity:.12}
+    58%{opacity:.9} 66%{opacity:.35} 78%{opacity:1} 100%{opacity:1}
+  }
+
+  /* ---------- character: sketched monitor + googly eyes ---------- */
+  .character{
+    position:fixed;z-index:3;
+    left:50vw;top:64vh;
+    width:min(300px,42vw);aspect-ratio:270/329;
+    transform:translate(-50%,-50%);
+    container-type:inline-size;
+  }
+  .character .frame{position:absolute;inset:0;width:100%;height:100%;user-select:none;-webkit-user-drag:none;pointer-events:none}
+
+  /* eye placement copied from data/homeScene.js (cqw of the character's width) */
+  .eye{
+    position:absolute;aspect-ratio:448/426;
+    filter:drop-shadow(0 0.03em 0.07em rgba(0,0,0,.28));
+  }
+  .eye--l{left:-1.8cqw;top:18.3cqw;width:51cqw}
+  .eye--r{left:53.9cqw;top:8.6cqw;width:50.5cqw;transform:rotate(4deg)}
+  .eye img{position:absolute;pointer-events:none;-webkit-user-drag:none;user-select:none}
+  .eye .socket{inset:0;width:100%;height:100%}
+  .eye .pupil{
+    top:50%;left:50%;width:calc(var(--pupratio)*100%);
+    transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+
+  /* eyelids — real assets cut from the socket art. They live just outside the
+     eye (clipped by .lids) and slide in when the lamp comes on: slam almost
+     shut against the sudden light, then relax into a squint and STAY there. */
+  .lids{position:absolute;inset:0;clip-path:ellipse(46.5% 46% at 50% 49.5%);pointer-events:none}
+  .lid{inset:0;width:100%;height:100%;transition:transform .5s ease}
+  .lid-top{transform:translateY(-70%)}
+  .lid-bot{transform:translateY(70%)}
+  .dark .lid-top{
+    transform:translateY(-8%);
+    animation:wince-top 1.6s cubic-bezier(.3,.7,.3,1) both;
+  }
+  .dark .lid-bot{
+    transform:translateY(11%);
+    animation:wince-bot 1.6s cubic-bezier(.3,.7,.3,1) both;
+  }
+  @keyframes wince-top{
+    0%  {transform:translateY(-70%)}
+    18% {transform:translateY(-1.5%)}   /* slam nearly shut */
+    58% {transform:translateY(-1.5%)}   /* hold the wince */
+    100%{transform:translateY(-8%)}     /* relax into the squint — and stay */
+  }
+  @keyframes wince-bot{
+    0%  {transform:translateY(70%)}
+    18% {transform:translateY(2%)}
+    58% {transform:translateY(2%)}
+    100%{transform:translateY(11%)}
+  }
+
+  /* ---------- wall light switch (from Downloads/light-switch, CSS-3D rocker) ----------
+     The switch and the lamp drive the same state: rocker ON = lamp on = dark mode. */
+  .ls-root{
+    --w:clamp(92px,9vw,130px);
+    --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+    --dur:360ms;
+    --ease:cubic-bezier(.32,1.42,.42,1);
+
+    position:fixed; right:10vw; top:24vh; z-index:6;
+    display:inline-block; line-height:0;
+    width:var(--w); height:calc(var(--w) * 1.58);
+    transition:filter var(--mode-t) ease;
+
+    --a-top:15deg;  --a-bot:6deg;
+    --veil-top:1;   --veil-bot:0;
+    --lip-top:1;    --lip-bot:0;
+    --occl-top:1;   --occl-bot:0;
+    --warm:0;
+  }
+  .ls-root.is-on{
+    --a-top:-6deg;  --a-bot:-15deg;
+    --veil-top:0;   --veil-bot:1;
+    --lip-top:0;    --lip-bot:1;
+    --occl-top:0;   --occl-bot:1;
+    --warm:1;
+  }
+  .dark .ls-root{ filter:brightness(.8); } /* white plastic, dimmed by the dark room */
+
+  .ls-btn{
+    position:absolute; inset:0; display:block; padding:0; border:0; background:none;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+    perspective:calc(var(--w) * 2.6);
+    perspective-origin:50% 46%;
+    transform-style:preserve-3d;
+  }
+  .ls-btn:active{ --press:calc(var(--w) * -0.007); }
+  .ls-btn:focus-visible{ outline:none; }
+  .ls-btn:focus-visible .ls-plate::before{ opacity:1; }
+
+  .ls-cast{
+    position:absolute; left:6%; right:6%; top:2.5%; bottom:-2%;
+    border-radius:calc(var(--w) * 0.12);
+    background:rgba(58,56,68,.34);
+    filter:blur(calc(var(--w) * 0.055));
+    transform:translateY(calc(var(--w) * 0.018));
+    pointer-events:none;
+  }
+
+  .ls-plate{
+    position:absolute; inset:0; display:block;
+    border-radius:calc(var(--w) * 0.088);
+    transform-style:preserve-3d;
+    background:
+      radial-gradient(120% 80% at 26% 12%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 58%),
+      linear-gradient(157deg,#ffffff 0%,#f7f6fa 26%,#edecf1 52%,#e0dfe6 78%,#d4d3da 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.98),
+      inset calc(var(--w)*0.004) 0 0 rgba(255,255,255,.7),
+      inset 0 calc(var(--w)*-0.010) calc(var(--w)*0.020) rgba(122,120,134,.20),
+      inset calc(var(--w)*-0.006) 0 calc(var(--w)*0.016) rgba(122,120,134,.16);
+  }
+  .ls-plate::after{
+    content:""; position:absolute; inset:calc(var(--w)*0.016);
+    border-radius:calc(var(--w) * 0.073);
+    box-shadow:
+      inset 0 1px calc(var(--w)*0.005) rgba(255,255,255,.92),
+      inset 0 calc(var(--w)*-0.004) calc(var(--w)*0.006) rgba(146,144,158,.26);
+    pointer-events:none;
+  }
+  .ls-plate::before{
+    content:""; position:absolute; inset:calc(var(--w)*-0.03);
+    border-radius:calc(var(--w) * 0.11);
+    box-shadow:0 0 0 calc(var(--w)*0.012) rgba(92,116,224,.6);
+    opacity:0; transition:opacity 160ms ease; pointer-events:none;
+  }
+
+  .ls-sheen{
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:.7;
+    background:
+      linear-gradient(118deg,
+        rgba(255,255,255,0) 30%, rgba(255,255,255,.55) 42%,
+        rgba(255,255,255,.62) 47%, rgba(255,255,255,0) 58%),
+      radial-gradient(80% 55% at 72% 92%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 70%);
+  }
+
+  .ls-well{
+    position:absolute; left:50%; top:50%;
+    width:calc(var(--w)*0.466); height:calc(var(--w)*0.742);
+    transform:translate(-50%,-50%);
+    transform-style:preserve-3d;
+    border-radius:calc(var(--w)*0.026);
+    background:linear-gradient(178deg,#b9b8c0 0%,#d6d5dc 40%,#c9c8d0 100%);
+  }
+  .ls-gap{
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(90deg,
+      rgba(88,86,96,.72) 0%, rgba(88,86,96,.10) 7%,
+      rgba(88,86,96,0) 50%,
+      rgba(88,86,96,.12) 93%, rgba(88,86,96,.66) 100%);
+  }
+  .ls-occl{
+    position:absolute; left:0; right:0; height:34%;
+    pointer-events:none; border-radius:inherit;
+    transition:opacity var(--dur) ease;
+  }
+  .ls-occl--top{
+    top:0; opacity:var(--occl-top);
+    background:linear-gradient(180deg,
+      rgba(64,62,72,.80) 0%, rgba(64,62,72,.34) 38%, rgba(64,62,72,0) 100%);
+  }
+  .ls-occl--bot{
+    bottom:0; opacity:var(--occl-bot);
+    background:linear-gradient(0deg,
+      rgba(64,62,72,.80) 0%, rgba(64,62,72,.34) 38%, rgba(64,62,72,0) 100%);
+  }
+
+  .ls-rocker{
+    position:absolute; left:50%; top:50%;
+    width:calc(var(--w)*0.421); height:calc(var(--w)*0.706);
+    transform:translate(-50%,-50%) translateZ(calc(var(--w)*0.012 + var(--press,0px)));
+    transform-style:preserve-3d;
+    transition:transform var(--dur) var(--ease);
+  }
+  .ls-face{
+    position:absolute; left:0; right:0; height:50%;
+    transform-style:preserve-3d; backface-visibility:hidden;
+    background:linear-gradient(176deg,#ffffff 0%,#fdfdfe 62%,#f9f8fb 100%);
+    box-shadow:0 0 calc(var(--w)*0.004) rgba(120,118,132,.30);
+    transition:transform var(--dur) var(--ease);
+  }
+  .ls-face--top{
+    top:0; transform-origin:50% 100%; transform:rotateX(var(--a-top));
+    border-radius:calc(var(--w)*0.02) calc(var(--w)*0.02) 0 0;
+  }
+  .ls-face--bot{
+    bottom:0; transform-origin:50% 0%; transform:rotateX(var(--a-bot));
+    border-radius:0 0 calc(var(--w)*0.02) calc(var(--w)*0.02);
+  }
+  .ls-veil{
+    position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    transition:opacity var(--dur) ease;
+    background:linear-gradient(180deg,
+      rgba(126,124,140,.20) 0%, rgba(126,124,140,.155) 72%, rgba(126,124,140,.13) 100%);
+  }
+  .ls-face--top .ls-veil{ opacity:var(--veil-top); }
+  .ls-face--bot .ls-veil{
+    opacity:var(--veil-bot);
+    background:linear-gradient(0deg,
+      rgba(126,124,140,.20) 0%, rgba(126,124,140,.155) 72%, rgba(126,124,140,.13) 100%);
+  }
+  .ls-lip{
+    position:absolute; left:6%; right:6%; height:calc(var(--w)*0.009);
+    border-radius:999px; pointer-events:none;
+    transition:opacity var(--dur) ease;
+    background:linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,.96) 22%,
+      rgba(255,255,255,.96) 78%, rgba(255,255,255,0) 100%);
+  }
+  .ls-face--top .ls-lip{ top:calc(var(--w)*0.004); opacity:var(--lip-top); }
+  .ls-face--bot .ls-lip{ bottom:calc(var(--w)*0.004); opacity:var(--lip-bot); }
+
+  .ls-bloom{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:calc(var(--w)*3.4); height:calc(var(--w)*3.4);
+    border-radius:50%; pointer-events:none; opacity:var(--warm);
+    background:radial-gradient(circle,
+      rgba(255,238,198,.80) 0%, rgba(255,234,186,.34) 30%, rgba(255,232,180,0) 66%);
+    transition:opacity 520ms ease;
+  }
+
+  .ls-grain{
+    position:absolute; inset:0; pointer-events:none;
+    border-radius:calc(var(--w) * 0.088);
+    background-image:var(--grain);
+    background-size:calc(var(--w)*0.6) calc(var(--w)*0.6);
+    opacity:.055; mix-blend-mode:overlay;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .dark .lid-top,.dark .lid-bot,.dark .cone,.dark .pool,.dark .lamp .bulb,.lamp.hopping svg{animation:none}
+    .lid{transition:none}
+    .ls-rocker,.ls-face,.ls-veil,.ls-lip,.ls-occl,.ls-bloom{ transition-duration:1ms; }
+  }
+</style>
+</head>
+<body>
+  <h1 class="title">Rachel J. Kim</h1>
+
+  <!-- light layers (only visible in dark mode) -->
+  <div class="cone" id="cone" aria-hidden="true"></div>
+  <div class="pool" aria-hidden="true"></div>
+
+  <!-- Luxo lamp = the dark-mode switch -->
+  <button class="lamp" id="lamp" type="button" aria-pressed="false" aria-label="Toggle the lamp (dark mode)">
+    <svg viewBox="0 0 340 340" aria-hidden="true">
+      <!-- fat disc base -->
+      <path class="fill-paper stroke" d="M28 306 C 30 296, 60 289, 95 289 C 130 289, 160 296, 162 306 C 162 314, 132 322, 95 322 C 58 322, 28 314, 28 306 Z"/>
+      <path class="sketch" d="M36 312 C 60 319, 130 319, 154 311"/>
+      <!-- stubby neck on the base -->
+      <path class="stroke" d="M82 288 C 84 281, 104 281, 106 288"/>
+      <!-- lower arm: double struts leaning back -->
+      <path class="stroke" d="M90 284 C 100 236, 114 186, 130 138"/>
+      <path class="stroke" d="M101 285 C 111 238, 124 190, 139 143"/>
+      <!-- spring squiggle across the struts -->
+      <path class="sketch" d="M100 250 q 12 -5 8 -13 q -10 -3 -7 -12 q 12 -4 8 -13 q -10 -3 -7 -12"/>
+      <!-- elbow joint -->
+      <circle class="fill-paper stroke" cx="136" cy="136" r="9"/>
+      <circle class="sketch" cx="136" cy="136" r="3.5"/>
+      <!-- upper arm: double struts reaching forward-down -->
+      <path class="stroke" d="M144 130 C 172 143, 198 158, 222 174"/>
+      <path class="stroke" d="M139 141 C 167 154, 192 168, 216 184"/>
+      <!-- spring on the upper arm -->
+      <path class="sketch" d="M172 150 q 4 10 -5 13 q -6 -7 -13 -3"/>
+      <!-- head joint -->
+      <circle class="fill-paper stroke" cx="224" cy="182" r="8"/>
+      <!-- dome head craning up-right at the character -->
+      <g transform="translate(224 182) rotate(-32)">
+        <!-- neck into the shade -->
+        <path class="stroke" d="M6 0 L 22 0"/>
+        <!-- dome shell, opening on the +x side -->
+        <path class="fill-paper stroke" d="M74 -32 A 37 37 0 1 0 74 32 C 77 22, 77 -22, 74 -32 Z"/>
+        <path class="sketch" d="M40 -30 A 33 33 0 0 0 40 30"/>
+        <!-- opening rim -->
+        <ellipse class="stroke" cx="76" cy="0" rx="9" ry="32" stroke-width="2.6"/>
+        <!-- bulb sitting in the mouth of the shade -->
+        <circle class="bulb" id="bulb" cx="80" cy="0" r="13"/>
+      </g>
+    </svg>
+  </button>
+  <span class="hint" id="hint">&uarr; click the lamp</span>
+
+  <!-- wall switch — wired to the same lamp/dark-mode state -->
+  <div class="ls-root" id="switch">
+    <span class="ls-bloom"></span>
+    <span class="ls-cast"></span>
+
+    <button type="button" class="ls-btn" role="switch" aria-checked="false" aria-label="Lamp switch (dark mode)">
+      <span class="ls-plate">
+        <span class="ls-sheen"></span>
+        <span class="ls-well">
+          <span class="ls-gap"></span>
+          <span class="ls-occl ls-occl--top"></span>
+          <span class="ls-occl ls-occl--bot"></span>
+
+          <span class="ls-rocker">
+            <span class="ls-face ls-face--top">
+              <span class="ls-veil"></span>
+              <span class="ls-lip"></span>
+            </span>
+            <span class="ls-face ls-face--bot">
+              <span class="ls-veil"></span>
+              <span class="ls-lip"></span>
+            </span>
+          </span>
+        </span>
+      </span>
+    </button>
+
+    <span class="ls-grain"></span>
+  </div>
+
+  <!-- the character from the home hero -->
+  <div class="character" id="character">
+    <!-- transparent-ink version (frontend's character-frame.png has a baked white bg,
+         which reads as a white box once the page goes dark) -->
+    <img class="frame" src="character-frame-alpha.png" alt="" draggable="false">
+    <div class="eye eye--l" data-eye>
+      <img class="socket" src="googly-eye-socket.png" alt="" draggable="false">
+      <img class="pupil" src="eye-pupil.png" alt="" draggable="false">
+      <div class="lids">
+        <img class="lid lid-top" src="googly-lid-top.png" alt="" draggable="false">
+        <img class="lid lid-bot" src="googly-lid-bottom.png" alt="" draggable="false">
+      </div>
+    </div>
+    <div class="eye eye--r" data-eye>
+      <img class="socket" src="googly-eye-socket.png" alt="" draggable="false">
+      <img class="pupil" src="eye-pupil.png" alt="" draggable="false">
+      <div class="lids">
+        <img class="lid lid-top" src="googly-lid-top.png" alt="" draggable="false">
+        <img class="lid lid-bot" src="googly-lid-bottom.png" alt="" draggable="false">
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">ask me about rachel !</p>
+
+<script>
+const TRAVEL=0.183;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- pupil tracking (same physics as GooglyEye.jsx) ---- */
+let target={x:innerWidth/2,y:innerHeight/2};
+let hasPointer=false;
+addEventListener("pointermove",e=>{target={x:e.clientX,y:e.clientY};hasPointer=true;},{passive:true});
+addEventListener("pointerdown",e=>{target={x:e.clientX,y:e.clientY};hasPointer=true;},{passive:true});
+
+const eyes=[...document.querySelectorAll("[data-eye]")].map(el=>({
+  el,pupil:el.querySelector(".pupil"),cur:{x:0,y:0}
+}));
+
+function frame(t){
+  const idleT=t/1000;
+  for(const e of eyes){
+    const r=e.el.getBoundingClientRect();
+    if(r.width===0)continue;
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    const maxT=r.width*TRAVEL;
+    let tx,ty;
+    if(!hasPointer){
+      const wob=reduce?0:1;
+      tx=Math.cos(idleT*0.8)*maxT*0.5*wob;
+      ty=Math.sin(idleT*1.1)*maxT*0.5*wob;
+    }else{
+      const dx=target.x-cx, dy=target.y-cy;
+      const dist=Math.hypot(dx,dy)||1;
+      const mag=Math.min(maxT,dist*(maxT/(r.width*0.9)));
+      tx=dx/dist*mag; ty=dy/dist*mag;
+    }
+    const k=reduce?1:0.18;
+    e.cur.x+=(tx-e.cur.x)*k;
+    e.cur.y+=(ty-e.cur.y)*k;
+    e.pupil.style.transform=
+      "translate(-50%,-50%) translate("+e.cur.x.toFixed(2)+"px,"+e.cur.y.toFixed(2)+"px)";
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---- aim the light cone from the bulb at the character ---- */
+const cone=document.getElementById("cone");
+const bulb=document.getElementById("bulb");
+const character=document.getElementById("character");
+
+function aimCone(){
+  const b=bulb.getBoundingClientRect();
+  const c=character.getBoundingClientRect();
+  const ax=b.left+b.width/2, ay=b.top+b.height/2;      // apex = bulb centre
+  const tx=c.left+c.width/2, ty=c.top+c.height/2;      // target = character centre
+  const dx=tx-ax, dy=ty-ay;
+  const dist=Math.hypot(dx,dy);
+  const len=dist*1.9;                                   // shine past the character
+  const w=Math.max(c.width*2.4,len*0.95);               // spread
+  cone.style.left=(ax-w/2)+"px";
+  cone.style.top=ay+"px";
+  cone.style.width=w+"px";
+  cone.style.height=len+"px";
+  // element points straight down; rotate its down-axis onto the bulb→character line
+  cone.style.transform="rotate("+Math.atan2(-dx,dy)+"rad)";
+}
+addEventListener("resize",aimCone);
+addEventListener("load",aimCone);
+aimCone();
+
+/* ---- the lamp + wall switch drive one shared state ---- */
+const lamp=document.getElementById("lamp");
+const hint=document.getElementById("hint");
+const swRoot=document.getElementById("switch");
+const swBtn=swRoot.querySelector(".ls-btn");
+
+function setDark(dark){
+  document.body.classList.toggle("dark",dark);
+  lamp.setAttribute("aria-pressed",String(dark));
+  swRoot.classList.toggle("is-on",dark);      // rocker follows, whoever was clicked
+  swBtn.setAttribute("aria-checked",String(dark));
+  hint.classList.add("used");
+  aimCone();
+
+  // the Luxo hop — it reacts to its power flipping either way
+  if(!reduce){
+    lamp.classList.remove("hopping"); void lamp.offsetWidth;
+    lamp.classList.add("hopping");
+  }
+}
+const toggleDark=()=>setDark(!document.body.classList.contains("dark"));
+lamp.addEventListener("click",toggleDark);
+swBtn.addEventListener("click",toggleDark);
+lamp.addEventListener("animationend",()=>lamp.classList.remove("hopping"));
+</script>
+</body>
+</html>
