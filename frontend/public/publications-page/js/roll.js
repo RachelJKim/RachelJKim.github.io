@@ -127,7 +127,7 @@
       frame.dataset.index = idx;
       const teaser = window.PUBLICATIONS[idx] && window.PUBLICATIONS[idx].teaser;
       frame.innerHTML =
-        (teaser ? `<img class="shot" src="${teaser}" alt="">` : "") +
+        window.PUB_HTML.teaserHTML(teaser) +
         `<img class="box" src="assets/frame.png" alt="">`;
       railCol.appendChild(frame);
 

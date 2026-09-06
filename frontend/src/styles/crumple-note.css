@@ -1,0 +1,79 @@
+/* CrumpleNote overlay — portaled onto <body>, so all of it is viewport-fixed.
+   The note itself stays ordinary DOM in the page; these layers only exist while
+   it is folded up. */
+
+.cn {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* The ball is drawn on a full-viewport transparent canvas so it can fly anywhere
+   on the page rather than being clipped by the note's box.
+
+   No fade: at T=0 the 3D sheet is pixel-for-pixel the DOM note (true-colour
+   texture, transparent margin), so swapping between them is invisible — a
+   crossfade would only show as a flicker. */
+.cn__gl {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  display: none;
+}
+.cn[data-phase='crumpled'] .cn__gl,
+.cn[data-phase='rested'] .cn__gl { display: block; }
+
+.cn__shadow {
+  position: fixed;
+  z-index: 29;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: rgba(22, 26, 32, 0.34);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+}
+.cn[data-phase='crumpled'] .cn__shadow,
+.cn[data-phase='rested'] .cn__shadow { opacity: 1; }
+
+.cn__ball-hit {
+  position: fixed;
+  z-index: 31;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.cn[data-phase='rested'] .cn__ball-hit { opacity: 1; pointer-events: auto; }
+.cn__ball-hit:focus-visible { outline: 2px solid #141414; outline-offset: 6px; }
+
+/* "put it back?" — sits under the ball on hover. */
+.cn__tip {
+  position: fixed;
+  z-index: 32;
+  transform: translate(-50%, 0);
+  font-family: var(--font-nav);
+  font-style: italic;
+  font-size: clamp(13px, 1.1vw, 18px);
+  color: #141414;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.cn__tip.is-on { opacity: 0.65; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cn__tip { transition-duration: 1ms; }
+}

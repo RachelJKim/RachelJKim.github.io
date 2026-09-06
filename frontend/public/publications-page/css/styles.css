@@ -43,6 +43,15 @@
   src: url("../fonts/TT_Moons_Trial_Regular.otf") format("opentype");
   font-weight: 400; font-style: normal; font-display: swap;
 }
+/* Great Vibes — the calligraphic hand for the "Coming Soon" placeholder that
+   stands in for a missing teaser. Self-hosted (SIL Open Font License) from the
+   site root alongside the other faces, so the page pulls nothing off a CDN.
+   It's the latin subset only — the placeholder is two English words. */
+@font-face {
+  font-family: "Great Vibes";
+  src: url("/fonts/GreatVibes-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
 
 :root {
   /* one design unit -> pixels. The horizontal gutter is proportional (4vw total, ~2vw a
@@ -253,9 +262,10 @@ body {
   position: absolute; z-index: 2;
   left: calc(var(--s) * var(--frame-l));
   width: calc(var(--s) * var(--frame-w)); height: calc(var(--s) * var(--frame-h));
+  container-type: inline-size;          /* the "Coming Soon" hand sizes off this */
   cursor: pointer;                      /* clicking the box tears the square off */
 }
-.frame img { position: absolute; display: block; }
+.frame img, .frame video { position: absolute; display: block; }
 .frame .shot {
   left: calc(var(--s) * 5); top: calc(var(--s) * 5);
   width:  calc(100% - var(--s) * 10);
@@ -263,6 +273,22 @@ body {
   object-fit: cover;
 }
 .frame .box { inset: 0; width: 100%; height: 100%; }
+
+/* no teaser yet -> the box holds a hand-written "Coming Soon" instead of
+   staying empty. Sits in the same inset as .shot so it centres in the frame. */
+.frame .soon, .detail-teaser .soon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Great Vibes", "Snell Roundhand", cursive;
+  /* sized off the box itself, so the hand keeps its proportion in the small
+     list frame and in the much larger one on the torn-off detail sheet */
+  font-size: 16cqi;
+  line-height: 1;
+  color: var(--pencil);
+  letter-spacing: .01em;
+  transform: rotate(-4deg);
+  user-select: none; pointer-events: none;
+}
 
 /* ═══ the frozen roll (overlay, never scrolls) ════════════════════ */
 
@@ -504,6 +530,7 @@ body {
 .detail-teaser {
   position: relative; margin-top: calc(var(--s) * 18);
   aspect-ratio: 146.6 / 91.2;          /* the gray box's own proportions */
+  container-type: inline-size;         /* ditto */
 }
 .detail-teaser .shot {
   position: absolute;

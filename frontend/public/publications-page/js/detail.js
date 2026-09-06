@@ -46,7 +46,7 @@
         <p class="pub-body"><span class="pub-title" id="detailTitle">${H.esc(p.title)}</span> <span class="pub-authors">(${H.authorsHTML(p)})</span></p>
         ${H.linksHTML(p)}
         ${p.abstract ? `<p class="detail-abstract">${H.esc(p.abstract)}</p>` : ""}
-        ${p.teaser ? `<div class="detail-teaser"><img class="shot" src="${H.esc(p.teaser)}" alt=""><img class="box" src="assets/frame.png" alt=""></div>` : ""}
+        <div class="detail-teaser">${H.teaserHTML(p.teaser)}<img class="box" src="assets/frame.png" alt=""></div>
       </div>`;
   }
 

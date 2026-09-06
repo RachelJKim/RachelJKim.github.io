@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import GooglyEye from '../components/GooglyEye'
 import SceneEditor from '../tools/SceneEditor'
 import TrashBin from '../components/TrashBin'
+import CrumpleNote from '../components/CrumpleNote'
 import { loadLayout, saveLayout, DEFAULT_LAYOUT } from '../data/homeScene'
 import '../styles/home.css'
 
@@ -30,12 +31,15 @@ export default function Home() {
   const [selected, setSelected] = useState('character')
   const [spat, setSpat] = useState(false) // have the nav objects been spat out of the bin?
   const [pastHero, setPastHero] = useState(false) // phone: scrolled off the hero screen (fades the scroll cue)
+  const [notePhase, setNotePhase] = useState('flat') // flat | crumpled | rested (the notes paper)
   const sceneRef = useRef(null)
   const characterRef = useRef(null)
   const notesRef = useRef(null)
+  const notesInnerRef = useRef(null)
   const cvRef = useRef(null)
   const binRef = useRef(null)
   const dragRef = useRef(null)
+  const crumpleRef = useRef(null)
 
   // The bin's centre expressed in the notes' own cqw frame (% of notes width).
   // The nav objects live inside the notes now, so this is where they fly *from* when
@@ -230,10 +234,23 @@ export default function Home() {
           separately-placeable transparent SVG whose "HCITechLab" is a hover link. */}
       <div
         ref={notesRef}
-        className={`hs-notes${sel('notes')}`}
+        className={`hs-notes${sel('notes')}${notePhase === 'flat' ? '' : ' is-crumpled'}`}
         style={{ '--x': `${n.leftCqw}cqw`, '--y': `${n.topCqh}cqh`, '--w': `${n.widthCqw}cqw`, '--rot': `${n.rot || 0}deg` }}
         {...dragProps('notes')}
       >
+        {/* Everything on the paper lives in this inner box. It has the same geometry as
+            .hs-notes (so the cqw-placed children are unaffected) but carries none of the
+            group's transform — which is what CrumpleNote rasterises, un-rotated. */}
+        <div
+          ref={notesInnerRef}
+          className="hs-notes-inner"
+          onClick={(e) => {
+            // Click the paper itself to crumple it. Links and the nav buttons on the
+            // note keep their own click; the editor is left alone entirely.
+            if (editMode || e.target.closest('a, button')) return
+            crumpleRef.current?.crumple()
+          }}
+        >
         <img className="hs-notes-bg" src="/images/home/notes-paper.png" alt="" draggable="false" />
         <div
           className={`hs-notes-text${sel('notesText')}`}
@@ -330,6 +347,11 @@ export default function Home() {
             </div>
           )
         })}
+        </div>
+
+        {/* Hover affordance for the crumple. Outside .hs-notes-inner so it never
+            gets baked into the snapshot. */}
+        {!editMode && <span className="hs-notes-hint" aria-hidden="true">crumple me</span>}
       </div>
 
       {/* Trashbin — click to spit the nav objects out (and click again to pull them
@@ -343,6 +365,21 @@ export default function Home() {
         {...dragProps('trash')}
       />
       </div>
+
+      {/* Click the paper → it folds into a ball, is thrown across the desk and lands
+          beside the bin. Click the ball to smooth it back out. The snapshot is cached,
+          so it's re-taken whenever the note's content changes (the nav objects being
+          spat out of the bin is the only thing that does). */}
+      {!editMode && (
+        <CrumpleNote
+          ref={crumpleRef}
+          sourceRef={notesInnerRef}
+          restRef={binRef}
+          snapshotKey={spat ? 'spat' : 'tidy'}
+          onPhaseChange={setNotePhase}
+          restHint="put it back?"
+        />
+      )}
 
       {editMode && (
         <SceneEditor

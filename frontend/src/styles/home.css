@@ -176,6 +176,48 @@
   width: var(--w);
   container-type: inline-size;
 }
+/* Everything printed on the paper lives in this inner box. Same geometry as
+   .hs-notes (width 100%, height driven by the paper image, and the positioned
+   ancestor for the cqw-placed children), but with none of the group's
+   translate/rotate — CrumpleNote rasterises THIS, so the snapshot comes out
+   square instead of tilted. Clicking it crumples the note. */
+.hs-notes-inner {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+.home-scene.editing .hs-notes-inner { cursor: default; }
+
+/* While the note is a ball (or in flight) the DOM copy steps aside. `visibility`,
+   not `display` — it must keep occupying layout so the 3D sheet knows where to
+   land when it comes back. */
+.hs-notes.is-crumpled { visibility: hidden; }
+
+/* Hover affordance for the crumple, in the same understated key as the
+   character's "coming soon". */
+.hs-notes-hint {
+  position: absolute;
+  left: 50%;
+  top: 101%;
+  transform: translate(-50%, -6px);
+  font-family: var(--font-nav);
+  font-style: italic;
+  font-size: 3.4cqw;
+  line-height: 1;
+  color: #141414;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.home-scene:not(.editing) .hs-notes:hover .hs-notes-hint {
+  opacity: 0.5;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-notes-hint { transition: opacity 0.2s ease; }
+}
+
 .hs-notes-bg {
   display: block;
   width: 100%;

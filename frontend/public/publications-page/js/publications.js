@@ -22,15 +22,18 @@
          { name: "Rachel Kim", me: true },   // me:true underlines the name
          { name: "Co Author" },
        ],
-       links:   LINKS(),               // the shared DOI/PDF/Video placeholder,
-                                       //   OR give this paper its own list:
-                                       //     [{ label: "PDF", href: "https://…" }]
-                                       //   omit the field entirely -> no links row
-       teaser:  "/images/publications/name.gif",  // OPTIONAL — fills the gray box.
+       links: [                        // the gray bar under the authors; see the
+         { label: "DOI", href: "…" },  //   link conventions note below. Omit the
+       ],                              //   field entirely -> no links row at all
+       teaser:  "/images/publications/name.mp4", // OPTIONAL — fills the gray box.
                                        //   Drop the file in
                                        //   frontend/public/images/publications/ and
                                        //   match its aspect ratio to the frame.
-                                       //   Leave the field out -> box stays blank.
+                                       //   Leave the field out -> the box shows a
+                                       //   handwritten "Coming Soon" instead.
+                                       //   See the teaser-format note below: an
+                                       //   .mp4 becomes a silent looping <video>,
+                                       //   anything else a lazy-loaded <img>.
        abstract: "One paragraph …",    // OPTIONAL — shown only on the torn-off
                                        //   detail sheet, never in the list.
      },
@@ -38,15 +41,37 @@
    Entries are listed newest first (time order).
    ═══════════════════════════════════════════════════════════════════ */
 
-// Default placeholder links, shared by any paper that just writes `links: LINKS()`.
-// To give a paper real, independent links, replace its `links:` with an inline array
-// (see the template above). Editing this list changes the placeholder for all papers
-// still using it.
-const LINKS = () => [
-  { label: "DOI",   href: "#" },
-  { label: "PDF",   href: "#" },
-  { label: "Video", href: "#" },
-];
+// ── link conventions ─────────────────────────────────────────────────
+// Every paper writes its own `links:` array; there is no shared placeholder.
+// Order them DOI → PDF → Video → Website so the bars read the same down the page.
+//
+//   DOI      https://doi.org/…            the publisher's landing page
+//   PDF      /files/papers/<id>.pdf       self-hosted, see below
+//   Video    https://youtu.be/…           the paper video
+//   Website  https://<name>.hcitech.org/  the project website
+//
+// PDFs are served from this repo (frontend/public/files/papers/) rather than
+// Google Drive: a Drive /file/d/…/view link forces the Drive viewer UI, while a
+// same-origin .pdf is handed straight to the browser's built-in PDF viewer and
+// opens in a new tab. To add one, drop the file in that folder and link it as
+// "/files/papers/<name>.pdf" — public/ is copied to the site root verbatim.
+//
+// A paper with nothing published yet simply omits `links:` — the bar disappears
+// instead of showing dead "#" links.
+
+// ── teaser format — MP4, not GIF ─────────────────────────────────────
+// Teasers are short silent loops, and a GIF pays ~30x for that: the same clips
+// ran 9-49 MB each as GIF and 0.2-1.4 MB as H.264, with *less* dither banding.
+// So: export the loop as .mp4 (yuv420p + faststart so it streams, no audio
+// track) and drop a matching .jpg of the first frame beside it as the poster.
+//
+//   ffmpeg -i clip.gif -c:v libx264 -preset slow -crf 26 \
+//          -pix_fmt yuv420p -movflags +faststart -an clip.mp4
+//   ffmpeg -i clip.gif -frames:v 1 -q:v 6 clip.jpg
+//
+// A ".mp4" teaser renders as a muted autoplaying loop with its .jpg as the
+// poster; any other extension still renders as a plain lazy <img>, so a
+// one-off PNG or GIF keeps working.
 
 // ── Co-author homepages — the one place to edit author links ─────────
 // List a co-author here and every occurrence of that name, across ALL papers,
@@ -74,25 +99,8 @@ window.PUBLICATIONS = [
     id: "dobi",
     title: "DOBI: Dynamic Opportunistic Body Input via Spare Joint Recruitment for Hands-Free XR",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Xun Qian" }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
-    teaser: "/images/publications/dobi.gif",
-  },
-  {
-    venue: "ToH 26",
-    type: "journal",
-    id: "vibgrasp",
-    title: "VibGrasp: Spatiotemporal Vibration Based Multimodal Haptic Rendering with a Lightweight Exo-Glove for 3D Shape Perception",
-    authors: [{ name: "Hojeong Lee" }, { name: "Eunho Kim" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
-    teaser: "/images/publications/VibGrasp.gif",
-  },
-  {
-    venue: "UIST 26 SIC",
-    type: "demo",
-    id: "snap-yo-mind",
-    title: "Snap-Yo-Mind: Arousal-Triggered Capture of Emotionally Salient Moments",
-    authors: [{ name: "Rachel Kim", me: true }, { name: "Donghee Hyun" }, { name: "Kyoungwhan Mheen" }],
-    links: LINKS(),
+    // not out yet — add links once UIST'26 publishes
+    teaser: "/images/publications/dobi.mp4",
   },
   {
     venue: "UIST 26 Demo",
@@ -100,7 +108,28 @@ window.PUBLICATIONS = [
     id: "dobi-demo",
     title: "Demonstrating DOBI: Dynamic Opportunistic Body Input via Spare Joint Recruitment for Hands-Free XR",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Xun Qian" }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
+    // UIST'26 adjunct proceedings aren't in the ACM DL yet — add the DOI when they are
+  },
+  {
+    venue: "UIST 26 SIC",
+    type: "demo",
+    id: "snap-yo-mind",
+    title: "Snap-Yo-Mind: Arousal-Triggered Capture of Emotionally Salient Moments",
+    authors: [{ name: "Rachel Kim", me: true }, { name: "Donghee Hyun" }, { name: "Kyoungwhan Mheen" }],
+    // UIST'26 adjunct proceedings aren't in the ACM DL yet — add the DOI when they are
+  },
+  {
+    venue: "ToH 26",
+    type: "journal",
+    id: "vibgrasp",
+    title: "VibGrasp: Spatiotemporal Vibration Based Multimodal Haptic Rendering with a Lightweight Exo-Glove for 3D Shape Perception",
+    authors: [{ name: "Hojeong Lee" }, { name: "Eunho Kim" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
+    links: [
+      { label: "DOI",     href: "https://doi.org/10.1109/TOH.2026.3685691" },
+      { label: "PDF",     href: "/files/papers/vibgrasp.pdf" },
+      { label: "Website", href: "https://vibgrasp.hcitech.org/" },
+    ],
+    teaser: "/images/publications/VibGrasp.mp4",
   },
   {
     venue: "IMWUT 25",
@@ -108,8 +137,13 @@ window.PUBLICATIONS = [
     id: "moving-press",
     title: "Moving-Press: Pressure-based Moving Phantom Sensation for Immersive VR Hand Interaction",
     authors: [{ name: "Dongkyu Kwak" }, { name: "Kyungjin Seo" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
-    teaser: "/images/publications/moving-press.gif",
+    links: [
+      { label: "DOI",     href: "https://doi.org/10.1145/3770682" },
+      { label: "PDF",     href: "/files/papers/moving-press.pdf" },
+      { label: "Video",   href: "https://youtu.be/_APRIPN81SE" },
+      { label: "Website", href: "https://moving-press.hcitech.org/" },
+    ],
+    teaser: "/images/publications/moving-press.mp4",
   },
   {
     venue: "UIST 25 Demo",
@@ -117,7 +151,9 @@ window.PUBLICATIONS = [
     id: "rack-pinion-demo",
     title: "Pressure Movement Sensation with Rack and Pinion Based Wearable Interface",
     authors: [{ name: "DongKyu Kwak" }, { name: "Kyungjin Seo" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
+    links: [
+      { label: "DOI", href: "https://doi.org/10.1145/3746058.3760439" },
+    ],
   },
   {
     venue: "UIST 25 SIC",
@@ -125,7 +161,9 @@ window.PUBLICATIONS = [
     id: "tacttail",
     title: "TactTail: Expanding Multimodal, Nonverbal Communication Between Human and Dog",
     authors: [{ name: "Rachel Kim", me: true }, { name: "Eunho Kim" }],
-    links: LINKS(),
+    links: [
+      { label: "DOI", href: "https://doi.org/10.1145/3746058.3758976" },
+    ],
   },
   {
     venue: "IMWUT 23",
@@ -133,8 +171,13 @@ window.PUBLICATIONS = [
     id: "hapticpilot",
     title: "HapticPilot: Authoring In-situ Hand Posture-Adaptive Vibrotactile Feedback for Virtual Reality",
     authors: [{ name: "Youjin Sung" }, { name: "Rachel Kim", me: true }, { name: "Kun Woo Song" }, { name: "Yitian Shao" }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
-    teaser: "/images/publications/hapticpilot.gif",
+    links: [
+      { label: "DOI",     href: "https://doi.org/10.1145/3631453" },
+      { label: "PDF",     href: "/files/papers/hapticpilot.pdf" },
+      { label: "Video",   href: "https://youtu.be/PJk7SUa8ZpI" },
+      { label: "Website", href: "https://hapticpilot.hcitech.org/" },
+    ],
+    teaser: "/images/publications/hapticpilot.mp4",
   },
   {
     venue: "VRST 22 Poster",
@@ -142,7 +185,10 @@ window.PUBLICATIONS = [
     id: "vibration-intensity-map",
     title: "Exploring Vibration Intensity Map Of Hand Postures For Haptic Rendering In XR",
     authors: [{ name: "Youjin Sung" }, { name: "Yitian Shao" }, { name: "Rachel Kim", me: true }, { name: "Sang Ho Yoon" }],
-    links: LINKS(),
+    links: [
+      { label: "DOI", href: "https://doi.org/10.1145/3562939.3565672" },
+      { label: "PDF", href: "/files/papers/vibration-intensity-map.pdf" },
+    ],
   },
 ];
 
@@ -180,9 +226,33 @@ window.PUBLICATIONS = [
     })
     .join(", ");
 
+  /* The inside of the gray box, shared by the list frame and the detail sheet.
+     An .mp4 teaser becomes a silent looping video: preload="none" + autoplay
+     lets the browser fetch it only once the box scrolls into view, so opening
+     the page costs the poster frames and nothing else. Everything else stays
+     an <img>, and a paper with no teaser yet gets the handwritten placeholder
+     so the box never reads as a rendering failure. */
+  const teaserHTML = t => {
+    if (!t) return `<span class="soon">Coming Soon</span>`;
+    if (/\.mp4$/i.test(t)) {
+      /* muted + playsinline is what makes autoplay allowed at all; the poster
+         is the clip's own first frame, so the box is never blank while the
+         video arrives. preload="metadata" keeps the initial cost to a header —
+         browsers hold off on the rest, and pause the loop, while the frame is
+         scrolled out of view. */
+      const poster = t.replace(/\.mp4$/i, ".jpg");
+      return `<video class="shot" src="${esc(t)}" poster="${esc(poster)}"`
+           + ` autoplay loop muted playsinline preload="metadata"></video>`;
+    }
+    return `<img class="shot" src="${esc(t)}" alt="" loading="lazy" decoding="async">`;
+  };
+
+  /* Everything but a bare in-page anchor opens in a new tab. The self-hosted
+     PDFs are same-origin, and this page runs inside an iframe — without the
+     target they would replace the scroll with the browser's PDF viewer. */
   const linksHTML = p => (p.links && p.links.length)
     ? `<p class="pub-links">${p.links.map(l => {
-        const ext = /^https?:/i.test(l.href) ? ' target="_blank" rel="noopener"' : "";
+        const ext = /^#/.test(l.href) ? "" : ' target="_blank" rel="noopener"';
         return `<a href="${esc(l.href)}"${ext}>${esc(l.label)}</a>`;
       }).join(" ")}</p>`
     : "";
@@ -205,5 +275,5 @@ window.PUBLICATIONS = [
 
   /* shared by js/detail.js, which rebuilds one entry at sheet size —
      same markup builders, so list and detail can never drift apart */
-  window.PUB_HTML = { esc, venueLabel, slug, authorsHTML, linksHTML };
+  window.PUB_HTML = { esc, venueLabel, slug, authorsHTML, linksHTML, teaserHTML };
 })();

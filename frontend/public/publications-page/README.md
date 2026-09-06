@@ -25,15 +25,24 @@ Add a paper as an object, newest first:
     { label: "PDF",   href: "https://..." },
     { label: "Video", href: "https://..." },
   ],
-  // teaser: "assets/teasers/your-image.png",  // optional image for the gray frame
+  // teaser: "/images/publications/your-clip.mp4",  // optional — fills the gray frame
 }
 ```
 
 Notes:
-- `href: "#"` renders a link that goes nowhere — replace with the real URL (external
-  URLs open in a new tab automatically).
-- The file has a `LINKS()` helper used as a placeholder; give each paper its own
-  `links` array with real hrefs when you have them.
+- Order the links `DOI → PDF → Video → Website` so the bars read the same down the page.
+  Every link opens in a new tab — required, since this page runs inside an iframe.
+- Teasers live in `frontend/public/images/publications/` and are **MP4, not GIF** — the
+  same clips were 9-49 MB as GIF and 0.2-1.4 MB as H.264, with less dither banding. An
+  `.mp4` teaser renders as a silent autoplaying loop; drop a same-named `.jpg` of the
+  first frame beside it, which is used as the poster so the box is never blank.
+  Any other extension still renders as a plain lazy `<img>`. The exact ffmpeg lines are
+  in the header of `js/publications.js`.
+- A paper with nothing published yet just omits `links` entirely; the bar disappears
+  rather than showing dead `#` links.
+- PDFs are self-hosted in `frontend/public/files/papers/` and linked as
+  `/files/papers/<name>.pdf`, so they open straight in the browser's PDF viewer.
+  Don't link Google Drive — a Drive `/file/d/…/view` URL forces the Drive UI.
 
 ## Files
 
